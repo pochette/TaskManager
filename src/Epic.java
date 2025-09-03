@@ -1,22 +1,20 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Epic extends Task{
-    protected List<Integer> subtaskList = new ArrayList<>();
+    protected Set<Integer> subtaskSet = new HashSet<>();
 
     public Epic(int id, String task, String description) {
         super(id, task, description);
-        Status status = Epic.Status.NEW;
+        this.status = Status.NEW;
     }
 
     public void addSubtask (int id) {
-        subtaskList.add(id);
+        subtaskSet.add(id);
     }
 
-    public List<Integer> getSubtaskList() {
-        return subtaskList;
+    public Set<Integer> getSubtaskSet() {
+        return subtaskSet;
     }
+
 
 }
