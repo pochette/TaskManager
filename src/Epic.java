@@ -2,11 +2,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Epic extends Task{
-    protected enum status {
-        NEW,
-        DONE,
-        IN_PROGRESS
-    };
+
+    public Epic(int id, String task, String description) {
+        super(id, task, description);
+        status status = Epic.status.NEW;
+
+
+
+    }
+
+
 
     Map<Integer, Epic> epicMap = new HashMap<>();
 
