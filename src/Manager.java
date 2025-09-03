@@ -1,40 +1,50 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Manager {
+    private static int id = 0;//Для генерации идентификаторов можно использовать числовое поле класса менеджер, увеличиваия его на
+    //нужно получить новое значение
 
-    Map<Integer, Task> tasks = new HashMap<>();
+    Map<Integer, Task> taskMap = new HashMap<>();
 
-    public Task newTask (Task task) {
-
+    public Task createTask (String title, String description) {
+        Task task = new Task(id++, title, description);
+        taskMap.put(task.getId(), task);
+        return task;
     }
 
-    public Task addTask ()
-
-    private int id;//Для генерации идентификаторов можно использовать числовое поле класса менеджер, увеличиваия его на
-                    //нужно получить новое значение
-    public List<Task> getTaskList() {
-    }
-
-    public List<Epic> getEpicList() {
-
-    }
-
-    public List<Subtask> getSubtaskList() {
-
-    }
-
-    public void deleteTasks () {
-
+    public Task createEpic (String title, String description) {
+        Task epic = new Epic(id++, title, description);
+        taskMap.put(epic.getId(), epic);
+        return epic;
     }
 
     public Task getTask (int id) {
-
+        return taskMap.get(id);
     }
 
-    public void updateTask (Task newtask, int id) {
+    public List<Task> getTaskList() {
+        return new ArrayList<>(taskMap.values());
+    }
 
+    public List<Epic> getEpicList() {
+        return new ArrayList<>(taskMap.values());
+    }
+
+    public List<Subtask> getSubtaskList() {
+        return new ArrayList<>(taskMap.values());
+    }
+
+    public void deleteAllTasks () {
+        taskMap.clear();
+        subtaskMap.clear();
+        epicMap.clear();
+    }
+
+    public void updateTask (int id, Task newtask) {
+        taskMap.replace(id, newtask);
     }
 
     public void deleteTaskId (int id) {
@@ -43,11 +53,7 @@ public class Manager {
     public List<Subtask> getSubtaskOfEpic (Epic epic) {
 
     }
-    public static int setId () {
-        int id = 0;
-        id++;
-        return id;
-    }
+
 
 
 
