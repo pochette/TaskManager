@@ -74,7 +74,6 @@ public class Manager {
         taskMap.replace(id, task);
     }
 
-
 //    Добавить потом в каждое обновление статусов сабтасков
     public void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskSet().isEmpty()) {
@@ -95,40 +94,37 @@ public class Manager {
                     allDone = false;
                 }
             }
-
-            if (allNew) {
-                epic.updateTasksStatus(Task.Status.NEW);
-            } if (allDone) {
-                epic.updateTasksStatus(Task.Status.DONE);
-            } else {
-                epic.updateTasksStatus(Task.Status.IN_PROGRESS);
-            }
+        }
+        if (allNew) {
+            epic.updateTasksStatus(Task.Status.NEW);
+        } else if (allDone) {
+            epic.updateTasksStatus(Task.Status.DONE);
+        } else {
+            epic.updateTasksStatus(Task.Status.IN_PROGRESS);
         }
     }
 
-    public void updateStatus (int id, Task task, Task.Status status) {
+    public void updateStatus (int id, Task.Status status) {
         Task tempTask = taskMap.get(id);
-        if (task == null) {
+        if (tempTask == null) {
             System.out.println("Задача с ID " + id + " не найдена.");
-        } else if (tempTask instanceof Subtask || tempTask instanceof Task) {
+        } else if ( !(tempTask instanceof Epic)) {
             tempTask.updateTasksStatus(status);
             taskMap.replace(id, tempTask);
         } else {
-
+            updateEpicStatus((Epic)tempTask);
         }
     }
 
     public void deleteTaskId (int id) {
         taskMap.remove(id);
     }
-    public Set<Integer> getSubtasksOfEpic (Epic epic) {
+    public List<Subtask> getSubtasksOfEpic (Epic epic) {
         Set<Integer> subtaskSet = new HashSet<>(epic.getSubtaskSet());
-        return subtaskSet;
+        List<Subtask> subtaskList = new ArrayList<>();
+        for (Integer subId : subtaskSet) {
+            subtaskList.add((Subtask) taskMap.get(subId));
+        }
+        return subtaskList;
     }
-
-
-
-
-
-
 }
