@@ -13,10 +13,4 @@ public class Subtask extends Task {
     public int getEpicId () {
         return epicId;
     }
-
-    @Override
-    public void updateTasksStatus(int id, Task task, Status status ) {
-
-        this.status = status;
-    }
 }
