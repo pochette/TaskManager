@@ -36,8 +36,11 @@ public class Task {
     public int getId () {
         return this.id;
     }
-    public void updateTasksStatus(Status status) {
-        this.status = status;
+    public void replaceTask (Task task) {
+        this.status = task.getStatus();
+        this.description = task.description;
+        this.title = task.title;
+
     }
 
     public Status getStatus () {

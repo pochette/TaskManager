@@ -5,7 +5,6 @@ public class Epic extends Task{
 
     public Epic(String task, String description) {
         super(task, description);
-        this.status = Status.NEW;
     }
 
     public void addSubtask (int id) {
