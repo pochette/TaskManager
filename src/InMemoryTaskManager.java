@@ -1,10 +1,10 @@
 import java.util.*;
 
-public class Manager {
+public class InMemoryTaskManager implements TaskManager {
     private static int id = 1; // генератор ID
     private Map<Integer, Task> taskMap = new HashMap<>();
 
-    public static int incrementId() {
+    static public int incrementId() {
         return id++;
     }
 
@@ -189,3 +189,4 @@ public class Manager {
         }
     }
 }
+

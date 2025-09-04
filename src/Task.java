@@ -24,13 +24,13 @@ public class Task {
         this.title = task;
         this.description = description;
         this.status = status;
-        this.id = Manager.incrementId();
+        this.id = InMemoryTaskManager.incrementId();
     }
     public Task (String title, String description) {
         this.title = title;
         this.description = description;
         this.status = Status.NEW;
-        this.id = Manager.incrementId();
+        this.id = InMemoryTaskManager.incrementId();
     }
 
     public int getId () {
