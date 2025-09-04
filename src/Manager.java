@@ -1,50 +1,23 @@
 import java.util.*;
 
-/**
- * Manages tasks, epics, and subtasks.
- * This class is responsible for creating, retrieving, updating, and deleting tasks.
- */
 public class Manager {
-    /**
-     * Counter for generating unique task IDs.
-     */
-    private static int id = 0;
-    /**
-     * Storage for all tasks, epics, and subtasks, mapped by their ID.
-     */
-    private final Map<Integer, Task> taskMap = new HashMap<>();
+    private static int id = 0;//Для генерации идентификаторов можно использовать числовое поле класса менеджер, увеличиваия его на
 
-    /**
-     * Creates a new Task.
-     * @param title The title of the task.
-     * @param description The description of the task.
-     * @return The created Task object.
-     */
+    //нужно получить новое значение
+    Map<Integer, Task> taskMap = new HashMap<>();
+
     public Task createTask (String title, String description) {
         Task task = new Task(id++, title, description, Task.Status.NEW);
         taskMap.put(task.getId(), task);
         return task;
     }
 
-    /**
-     * Creates a new Epic.
-     * @param title The title of the epic.
-     * @param description The description of the epic.
-     * @return The created Epic object.
-     */
     public Epic createEpic (String title, String description) {
         Epic epic = new Epic(id++, title, description);
         taskMap.put(epic.getId(), epic);
         return epic;
     }
 
-    /**
-     * Creates a new Subtask and associates it with an Epic.
-     * @param title The title of the subtask.
-     * @param description The description of the subtask.
-     * @param epic The parent Epic of this subtask.
-     * @return The created Subtask object.
-     */
     public Subtask createSubtask (String title, String description, Epic epic) {
         Subtask subtask = new Subtask(id++, title, description, epic.getId());
         taskMap.put(subtask.getId(), subtask);
@@ -52,7 +25,6 @@ public class Manager {
         return subtask;
     }
 
-    // Commented out method for creating a subtask with a specific status.
 //    public Subtask createSubtask (String title, String description, Epic epic, Task.Status status) {
 //        Subtask subtask = new Subtask(id++, title, description, epic.getId(), status);
 //        taskMap.put(subtask.getId(), subtask);
@@ -60,18 +32,10 @@ public class Manager {
 //        return subtask;
 //    }
 
-    /**
-     * Retrieves a task (or Epic, or Subtask) by its ID.
-     * @param id The ID of the task to retrieve.
-     * @return The Task object if found, otherwise null.
-     */
     public Task getTask (int id) {
         return taskMap.get(id);
     }
 
-    /**
-     * @return A list of all tasks (including Epics and Subtasks).
-     */
     public List<Task> getTaskList() {
         List<Task> taskList = new ArrayList<>();
         for (Task value : taskMap.values()) {
@@ -82,9 +46,6 @@ public class Manager {
         return taskList;
     }
 
-    /**
-     * @return A list containing only the Epics.
-     */
     public List<Epic> getEpicList() {
         List<Epic> epicList = new ArrayList<>();
         for (Task value : taskMap.values()) {
@@ -95,9 +56,6 @@ public class Manager {
         return epicList;
     }
 
-    /**
-     * @return A list containing only the Subtasks.
-     */
     public List<Subtask> getSubtaskList() {
         List<Subtask> subtaskList = new ArrayList<>();
         for (Task value : taskMap.values()) {
@@ -108,29 +66,15 @@ public class Manager {
         return subtaskList;
     }
 
-    /**
-     * Deletes all tasks, epics, and subtasks from the manager.
-     */
     public void deleteAllTasks () {
         taskMap.clear();
     }
 
-    /**
-     * Updates a task in the map with a new Task object.
-     * @param id The ID of the task to update.
-     * @param task The new Task object to replace the old one.
-     */
     public void updateTask (int id, Task task) {
         taskMap.replace(id, task);
     }
 
-    /**
-     * Updates the status of an Epic based on the statuses of its Subtasks.
-     * - If all subtasks are NEW, the epic is NEW.
-     * - If all subtasks are DONE, the epic is DONE.
-     * - Otherwise, the epic is IN_PROGRESS.
-     * @param epic The Epic to update.
-     */
+//    Добавить потом в каждое обновление статусов сабтасков
     public void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskSet().isEmpty()) {
             epic.updateTasksStatus(Task.Status.NEW);
@@ -160,11 +104,6 @@ public class Manager {
         }
     }
 
-    /**
-     * Updates the status of a given task or subtask. If the ID belongs to an Epic, its status is recalculated.
-     * @param id The ID of the task to update.
-     * @param status The new status.
-     */
     public void updateStatus (int id, Task.Status status) {
         Task tempTask = taskMap.get(id);
         if (tempTask == null) {
@@ -177,19 +116,9 @@ public class Manager {
         }
     }
 
-    /**
-     * Deletes a task by its ID.
-     * @param id The ID of the task to delete.
-     */
     public void deleteTaskId (int id) {
         taskMap.remove(id);
     }
-
-    /**
-     * Retrieves all Subtasks associated with a specific Epic.
-     * @param epic The Epic whose subtasks are to be retrieved.
-     * @return A list of Subtasks.
-     */
     public List<Subtask> getSubtasksOfEpic (Epic epic) {
         Set<Integer> subtaskSet = new HashSet<>(epic.getSubtaskSet());
         List<Subtask> subtaskList = new ArrayList<>();
@@ -199,3 +128,54 @@ public class Manager {
         return subtaskList;
     }
 }
+//Ваш проект реализует менеджер задач с поддержкой задач, эпиков и подзадач. Вот основные замечания и рекомендации:
+//
+//        **1. Ошибка в методе getId класса Task**
+//Метод вызывает сам себя, что приведёт к StackOverflowError.
+//```java
+//public int getId () {
+//    return this.getId(); // ошибка
+//}
+//```
+//        **Исправить на:**
+//        ```java
+//public int getId () {
+//    return this.id;
+//}
+//```
+//
+//        **2. Нарушение инкапсуляции**
+//Поля `title`, `description`, `status` в `Task` и `subtaskSet` в `Epic` лучше сделать private и добавить геттеры/сеттеры.
+//
+//**3. Дублирование кода**
+//В `Manager` методы `getTaskList`, `getEpicList`, `getSubtaskList` проходят по всей карте задач. Можно оптимизировать, если задачи будут храниться в отдельных коллекциях.
+//
+//        **4. Неиспользуемый Map в Main**
+//В классе `Main` объявлен `taskMap`, который нигде не используется. Лучше убрать.
+//
+//        **5. Конструктор Task**
+//В конструкторе `Task` не инициализируется поле `id`.
+//
+//        **6. Метод updateTasksStatus в Subtask**
+//Переопределён, но не используется и не нужен, если не добавляется новая логика.
+//
+//        **7. Метод updateEpicStatus**
+//Вызов `epic.updateTasksStatus` подразумевает, что статус эпика меняется только через этот метод. Это хорошо, но стоит явно указать, что статус эпика нельзя менять напрямую.
+//
+//        **8. Стиль кода**
+//        - Следует придерживаться единого стиля именования (например, task vs title).
+//        - Комментарии лучше писать на английском или придерживаться одного языка.
+//
+//**9. Потенциальная проблема с id**
+//Статическое поле `id` в `Manager` не потокобезопасно. Если планируется многопоточность — использовать AtomicInteger.
+//
+//        **10. Нет equals/hashCode**
+//Для корректной работы коллекций стоит переопределить методы `equals` и `hashCode` в сущностях.
+//
+//        **11. Нет проверки на существование эпика при создании подзадачи**
+//В методах создания подзадачи не проверяется, что переданный epic существует в `taskMap`.
+//
+//        ---
+//
+//        **Резюме:**
+//Проект реализован в целом верно, но требует исправления ошибок с геттерами, улучшения инкапсуляции, оптимизации хранения задач и доработки некоторых методов.

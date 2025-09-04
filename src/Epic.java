@@ -3,8 +3,8 @@ import java.util.*;
 public class Epic extends Task{
     protected Set<Integer> subtaskSet = new HashSet<>();
 
-    public Epic(int id, String task, String description) {
-        super(id, task, description);
+    public Epic(String task, String description) {
+        super(task, description);
         this.status = Status.NEW;
     }
 
@@ -16,5 +16,14 @@ public class Epic extends Task{
         return subtaskSet;
     }
 
-
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "subtaskSet=" + subtaskSet +
+                ", id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }
