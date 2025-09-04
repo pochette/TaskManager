@@ -4,23 +4,23 @@ public class Main {
     public static void main(String[] args) {
         Manager manager = new Manager();
 
-            Task task1 = manager.createTask("Занести офисы в CRM", "Сделать это до конца дня");
-            Task task2 = manager.createTask("Подготовить презентацию", "Презентация для встречи с клиентом");
-            Task task3 = manager.createTask("Обновить сайт", "Добавить новую информацию на главную страницу");
+        Task task1 = manager.createTask("Занести офисы в CRM", "Сделать это до конца дня");
+        Task task2 = manager.createTask("Подготовить презентацию", "Презентация для встречи с клиентом");
+        Task task3 = manager.createTask("Обновить сайт", "Добавить новую информацию на главную страницу");
 
-            Epic epic1 = manager.createEpic("Запустить рекламную кампанию", "Кампания для нового продукта");
-            Epic epic2 = manager.createEpic("Организовать мероприятие", "Мероприятие для клиентов");
-            Epic epic3 = manager.createEpic("Разработать мобильное приложение", "Приложение для удобства клиентов");
+        Epic epic1 = manager.createEpic("Запустить рекламную кампанию", "Кампания для нового продукта");
+        Epic epic2 = manager.createEpic("Организовать мероприятие", "Мероприятие для клиентов");
+        Epic epic3 = manager.createEpic("Разработать мобильное приложение", "Приложение для удобства клиентов");
 
-            Subtask subtask1 = manager.createSubtask("Создать баннеры", "Баннеры для онлайн-рекламы", epic1);
-            Subtask subtask2 = manager.createSubtask("Настроить таргетинг", "Таргетинг для соцсетей", epic1);
-            Subtask subtask3 = manager.createSubtask("Забронировать место", "Место для проведения мероприятия", epic2);
-            Subtask subtask4 = manager.createSubtask("Пригласить спикеров", "Спикеры для выступлений", epic2);
-            Subtask subtask5 = manager.createSubtask("Разработать дизайн", "Дизайн для приложения", epic3);
-            Subtask subtask6 = manager.createSubtask("Программирование", "Кодирование функционала", epic3);
+        Subtask subtask1 = manager.createSubtask("Создать баннеры", "Баннеры для онлайн-рекламы", epic1);
+        Subtask subtask2 = manager.createSubtask("Настроить таргетинг", "Таргетинг для соцсетей", epic1);
+        Subtask subtask3 = manager.createSubtask("Забронировать место", "Место для проведения мероприятия", epic2);
+        Subtask subtask4 = manager.createSubtask("Пригласить спикеров", "Спикеры для выступлений", epic2);
+        Subtask subtask5 = manager.createSubtask("Разработать дизайн", "Дизайн для приложения", epic3);
+        Subtask subtask6 = manager.createSubtask("Программирование", "Кодирование функционала", epic3);
 
-            // Вывод всех задач
-            System.out.println("Все задачи: ");
+        // Вывод всех задач
+        System.out.println("Все задачи: ");
 
 //
 //        Task task1 = manager.createTask("Task 1", "Description for Task 1", Task.Status.NEW);
@@ -52,5 +52,5 @@ public class Main {
 //
 //
 //    }
-}
+    }
 }
