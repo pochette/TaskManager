@@ -1,25 +1,29 @@
 import java.util.*;
 
 public class Manager {
-    private static int id = 0;//Для генерации идентификаторов можно использовать числовое поле класса менеджер, увеличиваия его на
+    private static int id = 1;//Для генерации идентификаторов можно использовать числовое поле класса менеджер, увеличиваия его на
 
     //нужно получить новое значение
     Map<Integer, Task> taskMap = new HashMap<>();
 
+    public static int incrementId() {
+        return id++;
+    }
+
     public Task createTask (String title, String description) {
-        Task task = new Task(id++, title, description, Task.Status.NEW);
+        Task task = new Task(title, description, Task.Status.NEW);
         taskMap.put(task.getId(), task);
         return task;
     }
 
     public Epic createEpic (String title, String description) {
-        Epic epic = new Epic(id++, title, description);
+        Epic epic = new Epic(title, description);
         taskMap.put(epic.getId(), epic);
         return epic;
     }
 
     public Subtask createSubtask (String title, String description, Epic epic) {
-        Subtask subtask = new Subtask(id++, title, description, epic.getId());
+        Subtask subtask = new Subtask (title, description, epic.getId());
         taskMap.put(subtask.getId(), subtask);
         epic.addSubtask(subtask.getId());
         return subtask;
