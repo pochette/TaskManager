@@ -1,5 +1,45 @@
 import java.util.*;
 
+// TODO // --- updateTask ---
+//public void updateTask(Task newTask) {
+//    if (!taskMap.containsKey(newTask.getId())) {
+//        System.out.println("Задача с ID " + newTask.getId() + " не найдена. Обновление не выполнено.");
+//        return;
+//    }
+//    if (newTask instanceof Epic || newTask instanceof Subtask) {
+//        System.out.println("Нельзя обновлять эпик/подзадачу этим методом.");
+//        return;
+//    }
+//    taskMap.put(newTask.getId(), newTask);
+//}
+//
+/// / --- updateEpic ---
+//public void updateEpic(Epic newEpic) {
+//    if (!taskMap.containsKey(newEpic.getId())) {
+//        System.out.println("Эпик с ID " + newEpic.getId() + " не найден. Обновление не выполнено.");
+//        return;
+//    }
+//    Epic oldEpic = (Epic) taskMap.get(newEpic.getId());
+//    // переносим связь с подзадачами
+//    newEpic.subtaskSet = oldEpic.getSubtaskSet();
+//    recalcEpicStatus(newEpic);
+//    taskMap.put(newEpic.getId(), newEpic);
+//}
+//
+
+//// --- updateSubtask ---
+//public void updateSubtask(Subtask newSubtask) {
+//    if (!taskMap.containsKey(newSubtask.getId())) {
+//        System.out.println("Подзадача с ID " + newSubtask.getId() + " не найдена. Обновление не выполнено.");
+//        return;
+//    }
+//    taskMap.put(newSubtask.getId(), newSubtask);
+//    Epic epic = (Epic) taskMap.get(newSubtask.getEpicId());
+//    if (epic != null) {
+//        recalcEpicStatus(epic);
+//    }
+//}
+
 public class InMemoryTaskManager implements TaskManager {
     private static int id = 1; // генератор ID
     private Map<Integer, Task> taskMap = new HashMap<>();

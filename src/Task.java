@@ -1,5 +1,5 @@
 public class Task {
-    protected int id;
+    protected Integer id;
     protected String title;
     protected String description;
 
@@ -20,8 +20,8 @@ public class Task {
         IN_PROGRESS
         };
 
-    public Task (String task, String description, Status status) {
-        this.title = task;
+    public Task (String title, String description, Status status) {
+        this.title = title;
         this.description = description;
         this.status = status;
         this.id = InMemoryTaskManager.incrementId();
@@ -32,8 +32,14 @@ public class Task {
         this.status = Status.NEW;
         this.id = InMemoryTaskManager.incrementId();
     }
+    public Task(int id, String title, String description, Status status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
 
-    public int getId () {
+    public Integer getId () {
         return this.id;
     }
     public void replaceTask (Task task) {
