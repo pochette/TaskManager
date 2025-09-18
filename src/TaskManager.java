@@ -3,14 +3,10 @@ import java.util.*;
 public interface TaskManager {
     // -------------------- Создание --------------------
 
-    public Task createTask(String title, String description);
+    public void createTask(Task task);
+    public void createSubtask(Subtask subtask);
+    public void createEpic(Epic epic);
 
-    public Task createTask(String title, String description, Task.Status status);
-
-    public Epic createEpic(String title, String description);
-
-    public Subtask createSubtask(String title, String description, Epic epic);
-    public Subtask createSubtask(String title, String description, Epic epic, Task.Status status);
 
     // -------------------- Получение --------------------
 
@@ -25,10 +21,10 @@ public interface TaskManager {
 
     // -------------------- Обновление --------------------
 
-    public void updateTask(Task newTask);
+    public void updateTask(Task newTask, int oldId);
 
-    public void updateEpic(Epic newEpic);
-    public void updateSubtask(Subtask newSubtask);
+    public void updateEpic(Epic newEpic, int oldId);
+    public void updateSubtask(Subtask newSubtask, int oldId);
     // -------------------- Удаление --------------------
 
     public void deleteAllTasks();
