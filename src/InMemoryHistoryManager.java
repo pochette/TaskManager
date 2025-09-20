@@ -8,7 +8,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void addHistory(Task task) {
-        if (historyList.size() > 10) {
+        if (historyList.size() > 9) {
             historyList.removeFirst();
             historyList.addLast(task);
             return;

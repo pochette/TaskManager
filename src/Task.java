@@ -24,13 +24,12 @@ public class Task {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.id = InMemoryTaskManager.incrementId();
+
     }
     public Task (String title, String description) {
         this.title = title;
         this.description = description;
         this.status = Status.NEW;
-        this.id = InMemoryTaskManager.incrementId();
     }
     public Task(int id, String title, String description, Status status) {
         this.id = id;
@@ -46,10 +45,14 @@ public class Task {
         this.status = task.getStatus();
         this.description = task.description;
         this.title = task.title;
-
     }
+
 
     public Status getStatus () {
         return this.status;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
