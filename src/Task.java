@@ -47,7 +47,9 @@ public class Task {
         this.title = task.title;
     }
 
-
+    public String getTitle () {
+        return title;
+    }
     public Status getStatus () {
         return this.status;
     }
