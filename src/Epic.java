@@ -6,9 +6,9 @@ public class Epic extends Task{
     public Epic(String task, String description) {
         super(task, description);
     }
-    public Epic(int id, String title, String description) {
-        super(id, title, description, Status.NEW);
-    }
+//    public Epic(int id, String title, String description) {
+//        super(id, title, description, Status.NEW);
+//    }
 
     public void addSubtask (int id) {
         subtaskSet.add(id);

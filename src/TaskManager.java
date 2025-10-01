@@ -6,6 +6,7 @@ public interface TaskManager {
     public void createTask(Task task);
     public void createSubtask(Subtask subtask);
     public void createEpic(Epic epic);
+    public HistoryManager getHistoryManager();
 
 
     // -------------------- Получение --------------------

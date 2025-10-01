@@ -31,12 +31,14 @@ public class Task {
         this.description = description;
         this.status = Status.NEW;
     }
-    public Task(int id, String title, String description, Status status) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-    }
+
+    //Убрал конструктор с id в аргументе.
+//    public Task(int id, String title, String description, Status status) {
+//        this.id = id;
+//        this.title = title;
+//        this.description = description;
+//        this.status = status;
+//    }
 
     public int getId () {
         return this.id;

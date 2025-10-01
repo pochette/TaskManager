@@ -43,7 +43,15 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
     private static int id = 1; // генератор ID
     private static final Map<Integer, Task> taskMap = new HashMap<>();
-    private final HistoryManager historyManager = Manager.getDefaultHistory();
+    private final HistoryManager historyManager;
+
+    public InMemoryTaskManager(HistoryManager historyManager) {
+        this.historyManager = historyManager;
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
 
     static public int incrementId() {
         return id++;
