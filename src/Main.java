@@ -3,6 +3,7 @@ import java.util.List;
 
 
 //todo Исправить класс Main и дописать тест.
+//TODO после добавления задач в historyManager  она пустая. Исправить методы в классе InMemoryHistoryManager
 
 
 public class Main {

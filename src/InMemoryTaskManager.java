@@ -42,7 +42,7 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int id = 1; // генератор ID
-    private Map<Integer, Task> taskMap = new HashMap<>();
+    private static final Map<Integer, Task> taskMap = new HashMap<>();
     private final HistoryManager historyManager = Manager.getDefaultHistory();
 
     static public int incrementId() {
@@ -59,7 +59,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpic(Epic epic) {
         epic.setId(incrementId());
-        taskMap.put(incrementId(), epic);
+        taskMap.put(epic.getId(), epic);
     }
 
     @Override
@@ -78,6 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
     // -------------------- Получение --------------------
     @Override
     public Task getTask(int id) {
+
         historyManager.add(taskMap.get(id));
         return taskMap.get(id);
     }

@@ -38,7 +38,7 @@ public class Task {
         this.status = status;
     }
 
-    public Integer getId () {
+    public int getId () {
         return this.id;
     }
     public void replaceTask (Task task) {
