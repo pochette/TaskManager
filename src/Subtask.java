@@ -5,15 +5,11 @@ public class Subtask extends Task {
         super(title, description);
         this.epicId = epicId;
     }
+
     public Subtask(String task, String description, int epicId, Status status) {
         super(task, description, status);
         this.epicId = epicId;
     }
-//    public Subtask (int id, String title, String description, Status status, int epicId) {
-//        super(id, title, description, status);
-//        this.epicId = epicId;
-//    }
-
 
     @Override
     public String toString() {
@@ -26,7 +22,7 @@ public class Subtask extends Task {
                 '}';
     }
 
-    public int getEpicId () {
+    public int getEpicId() {
         return epicId;
     }
 }

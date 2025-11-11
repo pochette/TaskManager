@@ -9,7 +9,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (node == null)
             return;
 
-
         Node prev = node.prev;
         Node next = node.next;
 
@@ -46,6 +45,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
     }
+
     @Override
     public List<Task> getHistory() {
         List<Task> taskList = new ArrayList<>();
@@ -56,7 +56,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         return taskList;
     }
-
 
     @Override
     public void add(Task task) {
@@ -87,6 +86,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 //        }
 //    }
 
+    @Override
+    public String toString() {
+        return "InMemoryHistoryManager{" +
+                "head=" + head +
+                ", tail=" + tail +
+                '}';
+    }
 
     private static class Node {
         Task task;
@@ -96,13 +102,5 @@ public class InMemoryHistoryManager implements HistoryManager {
         public Node(Task task) {
             this.task = task;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "InMemoryHistoryManager{" +
-                "head=" + head +
-                ", tail=" + tail +
-                '}';
     }
 }

@@ -44,12 +44,12 @@ public class Main {
 
         // 3. Удаляем задачу, которая есть в истории
         System.out.println("\n=== Удаляем задачу 1 ===");
-        taskManager.deleteTaskId(task1.getId());
+        taskManager.deleteTaskById(task1.getId());
         printHistory(historyManager);
 
         // 4. Удаляем эпик с тремя подзадачами
         System.out.println("\n=== Удаляем эпик 1 вместе с его подзадачами ===");
-        taskManager.deleteTaskId(epic1.getId());
+        taskManager.deleteTaskById(epic1.getId());
         printHistory(historyManager);
     }
 

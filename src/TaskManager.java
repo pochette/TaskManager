@@ -12,7 +12,7 @@ public interface TaskManager {
     // -------------------- Получение --------------------
 
     public Task getTask(int id);
-    public List<Task> getTaskList();
+    public List<Task> getListOfAllTasks();
 
     public List<Epic> getEpicList();
 
@@ -23,14 +23,13 @@ public interface TaskManager {
     // -------------------- Обновление --------------------
 
     public void updateTask(Task newTask, int oldId);
-
     public void updateEpic(Epic newEpic, int oldId);
     public void updateSubtask(Subtask newSubtask, int oldId);
     // -------------------- Удаление --------------------
 
     public void deleteAllTasks();
 
-    public void deleteTaskId(int id);
+    public void deleteTaskById(int id);
 
     // -------------------- Вспомогательное --------------------
 
