@@ -1,16 +1,17 @@
 import java.util.*;
 
-public class Epic extends Task{
+public class Epic extends Task {
     protected Set<Integer> subtaskSet = new HashSet<>();
 
     public Epic(String task, String description) {
         super(task, description);
     }
-//    public Epic(int id, String title, String description) {
-//        super(id, title, description, Status.NEW);
-//    }
 
-    public void addSubtask (int id) {
+    public Epic(Integer id, String title, Status status, String description) {
+        super(id, title, status, description);
+    }
+
+    public void addSubtask(int id) {
         subtaskSet.add(id);
     }
 
@@ -27,5 +28,10 @@ public class Epic extends Task{
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public TypesOfTask getType() {
+        return TypesOfTask.EPIC;
     }
 }

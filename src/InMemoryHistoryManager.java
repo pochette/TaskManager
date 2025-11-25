@@ -5,6 +5,14 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node head;
     private Node tail;
 
+    public static String toString(HistoryManager historyManager) {
+        return historyManager.toString();
+    }
+
+//    public static List<Integer> fromString(String value) {
+//        return List < Integer >;
+//    }
+
     private void removeNode(Node node) {
         if (node == null)
             return;
@@ -76,15 +84,6 @@ public class InMemoryHistoryManager implements HistoryManager {
             removeNode(node);
         }
     }
-//    public void remove(int id) {
-//        Node node = historyMap.get(id);
-//        if (node == null) {
-//            return;
-//        } else {
-//            removeNode(node);
-//            historyMap.remove(id);
-//        }
-//    }
 
     @Override
     public String toString() {

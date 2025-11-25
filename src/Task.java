@@ -3,6 +3,11 @@ public class Task {
     protected String title;
     protected String description;
 
+
+    public TypesOfTask getType() {
+        return TypesOfTask.TASK;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -11,6 +16,18 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    public String toString(Task task) {
+        return task.getId() + "," +
+                task.getType() + "," +
+                task.getTitle() + "," +
+                task.getStatus() + "," +
+                task.getDescription();
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 
     protected Status status;
@@ -32,13 +49,13 @@ public class Task {
         this.status = Status.NEW;
     }
 
-    //Убрал конструктор с id в аргументе.
-//    public Task(int id, String title, String description, Status status) {
-//        this.id = id;
-//        this.title = title;
-//        this.description = description;
-//        this.status = status;
-//    }
+    public Task(Integer id, String title, Status status, String description)  {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
+
 
     public int getId () {
         return this.id;

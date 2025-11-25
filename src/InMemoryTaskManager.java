@@ -1,9 +1,9 @@
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static final Map<Integer, Task> taskMap = new HashMap<>();
+    protected static final Map<Integer, Task> taskMap = new HashMap<>();
     private static int id = 1; // генератор ID
-    private final HistoryManager historyManager;
+    protected final HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -60,7 +60,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-
     public List<Epic> getEpicList() {
         List<Epic> epicList = new ArrayList<>();
         for (Task t : taskMap.values()) {
