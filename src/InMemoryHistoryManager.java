@@ -9,26 +9,17 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyManager.toString();
     }
 
-//    public static List<Integer> fromString(String value) {
-//        return List < Integer >;
-//    }
-
     private void removeNode(Node node) {
-        if (node == null)
-            return;
+        if (node == null) return;
 
         Node prev = node.prev;
         Node next = node.next;
 
-        if (prev != null)
-            prev.next = next;
-        else
-            head = next;
+        if (prev != null) prev.next = next;
+        else head = next;
 
-        if (next != null)
-            next.prev = prev;
-        else
-            tail = prev;
+        if (next != null) next.prev = prev;
+        else tail = prev;
     }
 
     @Override
@@ -67,8 +58,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if (task == null)
-            return;
+        if (task == null) return;
         remove(task.getId());
         Node node = new Node(task);
         linkLast(node);
@@ -87,10 +77,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public String toString() {
-        return "InMemoryHistoryManager{" +
-                "head=" + head +
-                ", tail=" + tail +
-                '}';
+        return "InMemoryHistoryManager{" + "head=" + head + ", tail=" + tail + '}';
     }
 
     private static class Node {

@@ -43,6 +43,13 @@ public class InMemoryTaskManager implements TaskManager {
         recalcEpicStatus(epic);
     }
 
+    @Override
+    public String toString() {
+        return "InMemoryTaskManager{" +
+                "historyManager=" + historyManager +
+                '}';
+    }
+
     // -------------------- Получение --------------------
     @Override
     public Task getTask(int id) {
@@ -153,11 +160,28 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskById(int id) {
-        if (!taskMap.containsKey(id)) {
+        Task taskToRemove = taskMap.get(id);
+        if (taskToRemove == null) {
             System.out.println("Задача с ID " + id + " не найдена. Удаление не выполнено.");
             return;
         }
-        taskMap.remove(id);
+
+        if (taskToRemove instanceof Epic) {
+            Epic epic = (Epic) taskToRemove;
+            // Сначала удаляем все подзадачи этого эпика
+            for (Integer subtaskId : epic.getSubtaskSet()) {
+                taskMap.remove(subtaskId);
+                historyManager.remove(subtaskId);
+            }
+        } else if (taskToRemove instanceof Subtask) {
+            // Обновляем родительский эпик
+            Subtask subtask = (Subtask) taskToRemove;
+            Epic epic = (Epic) taskMap.get(subtask.getEpicId());
+            epic.getSubtaskSet().remove((Integer) subtask.getId());
+            recalcEpicStatus(epic);
+        }
+
+        taskMap.remove(id); // Удаляем саму задачу/эпик
         historyManager.remove(id);
     }
 
@@ -194,4 +218,3 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 }
-
