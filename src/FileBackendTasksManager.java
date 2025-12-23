@@ -1,10 +1,9 @@
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackendTasksManager extends InMemoryTaskManager {
@@ -15,11 +14,11 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         this.file = path;
     }
 
-    public static String toString (HistoryManager historyManager) {
-        List <Task> taskList = historyManager.getHistory();
+    public static String toString(HistoryManager historyManager) {
+        List<Task> taskList = historyManager.getHistory();
         StringBuilder result = new StringBuilder();
         for (Task task : taskList) {
-            result.append(task.getId()).append(",");
+            result.append(task.getIdTask()).append(",");
         }
         // Удаляем последнюю запятую, если она есть
         if (result.length() > 0) {
@@ -35,9 +34,9 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         manager.createEpic(new Epic("Epic1", "epic1Description"));
         manager.createSubtask(new Subtask("Subtask1", "subtask1Description", 2, Task.Status.NEW));
 
-        manager.getTask(3);
-        manager.getTask(2);
-        manager.getTask(1);
+        manager.getTaskById(3);
+        manager.getTaskById(2);
+        manager.getTaskById(1);
 
         System.out.println("--- ИСХОДНЫЙ МЕНЕДЖЕР ---");
         System.out.println(toString(manager.getHistoryManager()));
@@ -54,14 +53,6 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         System.out.println("История идентична: " +
                 toString(manager.getHistoryManager()).equals(toString(managerFromFile.getHistoryManager()))
         );
-    }
-
-    @Override
-    public String toString() {
-        return "FileBackendTasksManager{" +
-                "file=" + file +
-                ", historyManager=" + historyManager +
-                '}';
     }
 
     public static FileBackendTasksManager loadFromFile(Path path) throws ManagerSaveException {
@@ -85,34 +76,59 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
 
                 if (!isHistorySection) {
                     Task task = formString(line);
-                    manager.taskMap.put(task.getId(), task);
-                    if (task.getId() > maxId) {
-                        maxId = task.getId();
+                    taskMap.put(task.getIdTask(), task);
+                    if (task.getIdTask() > maxId) {
+                        maxId = task.getIdTask();
                     }
                 } else {
                     String[] ids = line.split(",");
                     for (String idStr : ids) {
-                        manager.historyManager.add(manager.taskMap.get(Integer.parseInt(idStr)));
+                        manager.historyManager.add(taskMap.get(Integer.parseInt(idStr)));
                     }
                 }
             }
 
             // Восстанавливаем связи
-            for (Task task : manager.taskMap.values()) {
-                if (task instanceof Subtask) {
-                    Subtask subtask = (Subtask) task;
-                    Epic epic = (Epic) manager.taskMap.get(subtask.getEpicId());
+            for (Task task : taskMap.values()) {
+                if (task instanceof Subtask subtask) {
+                    Epic epic = (Epic) taskMap.get(subtask.getEpicIdTask());
                     if (epic != null) {
-                        epic.addSubtask(subtask.getId());
+                        epic.addSubtask(subtask.getIdTask());
                     }
                 }
             }
-            manager.id = maxId + 1; // Устанавливаем следующий ID
+            //manager.setId(maxId + 1); // Устанавливаем следующий ID
 
         } catch (IOException e) {
-            throw new ManagerSaveException("Не удалось загрузить данные из файла",e);
+            throw new ManagerSaveException("Не удалось загрузить данные из файла", e);
         }
         return manager;
+    }
+
+    public static Task formString(String value) {
+        String[] valuesOfFields = value.split(",");
+        Integer id = Integer.parseInt(valuesOfFields[0]);
+        TypesOfTask typesOfTask = TypesOfTask.valueOf(valuesOfFields[1]);
+        String title = valuesOfFields[2];
+        Task.Status status = Task.Status.valueOf(valuesOfFields[3]);
+        String description = valuesOfFields[4];
+
+        return switch (typesOfTask) {
+            case TASK -> new Task(id, title, status, description);
+            case EPIC -> new Epic(id, title, status, description);
+            case SUBTASK -> {
+                int epicId = Integer.parseInt(valuesOfFields[5]);
+                yield new Subtask(id, title, status, description, epicId);
+            }
+        };
+    }
+
+    @Override
+    public String toString() {
+        return "FileBackendTasksManager{" +
+                "file=" + file +
+                ", historyManager=" + historyManager +
+                '}';
     }
 
     private void save() throws ManagerSaveException {
@@ -150,8 +166,8 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task getTask(int id) {
-        Task task = super.getTask(id);
+    public Task getTaskById(int id) {
+        Task task = super.getTaskById(id);
         save();
         return task;
     }
@@ -186,31 +202,13 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         save();
     }
 
-    public static Task formString(String value) {
-        String[] valuesOfFields = value.split(",");
-        Integer id = Integer.parseInt(valuesOfFields[0]);
-        TypesOfTask typesOfTask = TypesOfTask.valueOf(valuesOfFields[1]);
-        String title = valuesOfFields[2];
-        Task.Status status = Task.Status.valueOf(valuesOfFields[3]);
-        String description = valuesOfFields[4];
-
-        return switch (typesOfTask) {
-            case TASK -> new Task(id, title, status, description);
-            case EPIC -> new Epic(id, title, status, description);
-            case SUBTASK -> {
-                int epicId = Integer.parseInt(valuesOfFields[5]);
-                yield new Subtask(id, title, status, description, epicId);
-            }
-        };
-    }
-
     private String taskToString(Task task) {
         String epicIdField = "";
         if (task instanceof Subtask) {
-            epicIdField = String.valueOf(((Subtask) task).getEpicId());
+            epicIdField = String.valueOf(((Subtask) task).getEpicIdTask());
         }
         return String.join(",",
-                String.valueOf(task.getId()),
+                String.valueOf(task.getIdTask()),
                 task.getType().toString(),
                 task.getTitle(),
                 task.getStatus().toString(),
@@ -219,8 +217,6 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         );
     }
 
-
-
     public static class ManagerSaveException extends RuntimeException {
         public ManagerSaveException(String message, Throwable cause) {
             super(message, cause);
@@ -228,3 +224,4 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
     }
 
 }
+

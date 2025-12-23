@@ -7,12 +7,12 @@ public class Epic extends Task {
         super(task, description);
     }
 
-    public Epic(Integer id, String title, Status status, String description) {
-        super(id, title, status, description);
+    public Epic(Integer idTask, String title, Status status, String description) {
+        super(idTask, title, status, description);
     }
 
-    public void addSubtask(int id) {
-        subtaskSet.add(id);
+    public void addSubtask(int idTask) {
+        subtaskSet.add(idTask);
     }
 
     public Set<Integer> getSubtaskSet() {
@@ -23,7 +23,7 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "subtaskSet=" + subtaskSet +
-                ", id=" + id +
+                ", idTask=" + this.getIdTask() +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

@@ -12,9 +12,9 @@ public class Main {
         Epic epic1 = new Epic("Эпик 1", "Эпик с подзадачами");
         taskManager.createEpic(epic1);
 
-        Subtask sub1 = new Subtask("Подзадача 1", "К Эпику 1", epic1.getId(), Task.Status.NEW );
-        Subtask sub2 = new Subtask("Подзадача 2", "К Эпику 1",  epic1.getId(), Task.Status.NEW);
-        Subtask sub3 = new Subtask("Подзадача 3", "К Эпику 1",  epic1.getId(), Task.Status.NEW);
+        Subtask sub1 = new Subtask("Подзадача 1", "К Эпику 1", epic1.getIdTask(), Task.Status.NEW );
+        Subtask sub2 = new Subtask("Подзадача 2", "К Эпику 1",  epic1.getIdTask(), Task.Status.NEW);
+        Subtask sub3 = new Subtask("Подзадача 3", "К Эпику 1",  epic1.getIdTask(), Task.Status.NEW);
         taskManager.createSubtask(sub1);
         taskManager.createSubtask(sub2);
         taskManager.createSubtask(sub3);
@@ -24,32 +24,32 @@ public class Main {
 
         // 2. Запрос задач в разном порядке
         System.out.println("=== Запрос задач ===");
-        taskManager.getTask(task1.getId());
+        taskManager.getTaskById(task1.getIdTask());
         printHistory(historyManager);
 
-        taskManager.getTask(epic1.getId());
+        taskManager.getTaskById(epic1.getIdTask());
         printHistory(historyManager);
 
-        taskManager.getTask(sub2.getId());
+        taskManager.getTaskById(sub2.getIdTask());
         printHistory(historyManager);
 
-        taskManager.getTask(task2.getId());
+        taskManager.getTaskById(task2.getIdTask());
         printHistory(historyManager);
 
-        taskManager.getTask(epic2.getId());
+        taskManager.getTaskById(epic2.getIdTask());
         printHistory(historyManager);
 
-        taskManager.getTask(task1.getId()); // повторный запрос
+        taskManager.getTaskById(task1.getIdTask()); // повторный запрос
         printHistory(historyManager);
 
         // 3. Удаляем задачу, которая есть в истории
         System.out.println("\n=== Удаляем задачу 1 ===");
-        taskManager.deleteTaskById(task1.getId());
+        taskManager.deleteTaskById(task1.getIdTask());
         printHistory(historyManager);
 
         // 4. Удаляем эпик с тремя подзадачами
         System.out.println("\n=== Удаляем эпик 1 вместе с его подзадачами ===");
-        taskManager.deleteTaskById(epic1.getId());
+        taskManager.deleteTaskById(epic1.getIdTask());
         printHistory(historyManager);
     }
 

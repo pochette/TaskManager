@@ -1,37 +1,42 @@
-import java.util.*;
+import java.util.List;
 
 public interface TaskManager {
     // -------------------- Создание --------------------
 
-    public void createTask(Task task);
-    public void createSubtask(Subtask subtask);
-    public void createEpic(Epic epic);
-    public HistoryManager getHistoryManager();
+    void createTask(Task task);
 
+    void createSubtask(Subtask subtask);
+
+    void createEpic(Epic epic);
+
+    HistoryManager getHistoryManager();
 
     // -------------------- Получение --------------------
 
-    public Task getTask(int id);
-    public List<Task> getListOfAllTasks();
+    Task getTaskById(int id);
 
-    public List<Epic> getEpicList();
+    List<Task> getListOfAllTasks();
 
-    public List<Subtask> getSubtaskList();
+    List<Epic> getEpicList();
 
-    public List<Subtask> getSubtasksOfEpic(Epic epic);
+    List<Subtask> getSubtaskList();
+
+    List<Subtask> getSubtasksOfEpic(Epic epic);
 
     // -------------------- Обновление --------------------
 
-    public void updateTask(Task newTask, int oldId);
-    public void updateEpic(Epic newEpic, int oldId);
-    public void updateSubtask(Subtask newSubtask, int oldId);
+    void updateTask(Task newTask, int oldId);
+
+    void updateEpic(Epic newEpic, int oldId);
+
+    void updateSubtask(Subtask newSubtask, int oldId);
     // -------------------- Удаление --------------------
 
-    public void deleteAllTasks();
+    void deleteAllTasks();
 
-    public void deleteTaskById(int id);
+    void deleteTaskById(int id);
 
     // -------------------- Вспомогательное --------------------
 
-   // void recalcEpicStatus(Epic epic);
+    // void recalcEpicStatus(Epic epic);
 }

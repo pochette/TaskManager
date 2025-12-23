@@ -1,31 +1,31 @@
 public class Subtask extends Task {
-    private final int epicId;
+    private final int epicIdTask;
 
-    public Subtask(String title, String description, int epicId) {
+    public Subtask(String title, String description, int epicIdTask) {
         super(title, description);
-        this.epicId = epicId;
+        this.epicIdTask = epicIdTask;
     }
     @Override
     public TypesOfTask getType() {
         return TypesOfTask.SUBTASK;
     }
 
-    public Subtask(String task, String description, int epicId, Status status) {
+    public Subtask(String task, String description, int epicIdTask, Status status) {
         super(task, description, status);
-        this.epicId = epicId;
+        this.epicIdTask = epicIdTask;
     }
 
-    public Subtask(Integer id, String title, Status status, String description, int epicId) {
+    public Subtask(Integer id, String title, Status status, String description, int epicIdTask) {
         super(id, title, status, description);
-        this.epicId = epicId;
+        this.epicIdTask = epicIdTask;
     }
 
 
     @Override
     public String toString() {
         return "Subtask{" +
-                "epicId=" + epicId +
-                ", id=" + id +
+                "epicIdTask=" + epicIdTask +
+                ", id=" + this.getIdTask() +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
@@ -33,16 +33,16 @@ public class Subtask extends Task {
     }
 
     public String toString(Subtask subtask) {
-        return subtask.getId() + "," +
+        return subtask.getIdTask() + "," +
                 subtask.getType() + "," +
                 subtask.getTitle() + "," +
                 subtask.getStatus() + "," +
                 subtask.getDescription() + "," +
-                subtask.getEpicId();
+                subtask.getEpicIdTask();
     }
 
 
-    public int getEpicId() {
-        return epicId;
+    public int getEpicIdTask() {
+        return epicIdTask;
     }
 }

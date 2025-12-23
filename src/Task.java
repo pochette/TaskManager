@@ -1,79 +1,73 @@
 public class Task {
-    protected Integer id;
+    private static int id = 0;
+    protected final int idTask;
     protected String title;
     protected String description;
+    protected Status status;
 
+    public Task(String title, String description, Status status) {
+        idTask = incrementId();
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
+
+    public Task(String title, String description) {
+        idTask = incrementId();
+        this.title = title;
+        this.description = description;
+        this.status = Status.NEW;
+    }
+
+    public Task(int idTask, String title, Status status, String description) {
+        this.idTask = idTask;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+    }
+
+
+    private static int incrementId() {
+        return id++;
+    }
 
     public TypesOfTask getType() {
         return TypesOfTask.TASK;
     }
 
+
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return "Task{" + "idTask=" + idTask + ", title='" + title + '\'' + ", description='" + description + '\'' + ", status=" + status + '}';
     }
 
     public String toString(Task task) {
-        return task.getId() + "," +
-                task.getType() + "," +
-                task.getTitle() + "," +
-                task.getStatus() + "," +
-                task.getDescription();
+        return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription();
     }
 
     public String getDescription() {
         return this.description;
     }
 
-    protected Status status;
-    public enum Status {
-        NEW,
-        DONE,
-        IN_PROGRESS
-        };
-
-    public Task (String title, String description, Status status) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
-
-    }
-    public Task (String title, String description) {
-        this.title = title;
-        this.description = description;
-        this.status = Status.NEW;
+    public int getIdTask() {
+        return idTask;
     }
 
-    public Task(Integer id, String title, Status status, String description)  {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-    }
-
-
-    public int getId () {
-        return this.id;
-    }
-    public void replaceTask (Task task) {
+    public void replaceTask(Task task) {
         this.status = task.getStatus();
         this.description = task.description;
         this.title = task.title;
     }
 
-    public String getTitle () {
+    public String getTitle() {
         return title;
     }
-    public Status getStatus () {
+
+    public Status getStatus() {
         return this.status;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public enum Status {
+        NEW, DONE, IN_PROGRESS
     }
 }
