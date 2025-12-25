@@ -184,6 +184,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
 
         taskManager.deleteTaskById(subtask1.getIdTask());
+        subtaskList = taskManager.getSubtaskList();
         assertEquals(1, subtaskList.size(), "Должен остаться 1 сабтаск после удаления одного");
 
         taskManager.deleteAllTasks();
@@ -209,4 +210,19 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(0, subtasksOfEpic.size(), "Список сабтасков для данного эпика должен быть пуст после удаления всех задач");
     }
 
+
+    @Test
+    void shouldUpdateSubtask (){
+        taskManager.createEpic(epic);
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+        Subtask updatetedSubtask = new Subtask("update Subtask1", "update description subtask1", epic.getIdTask(), Task.Status.IN_PROGRESS);
+        taskManager.updateSubtask(updatetedSubtask, subtask1.getIdTask());
+
+        assertEquals(updatetedSubtask, taskManager.getTaskById(subtask1.getIdTask()));
+
+        Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2", epic.getIdTask(), Task.Status.DONE);
+        taskManager.updateSubtask(updatedSubtask2,subtask1.getIdTask());
+        assertEquals(updatedSubtask2, taskManager.getTaskById(subtask1.getIdTask()));
+    }
 }

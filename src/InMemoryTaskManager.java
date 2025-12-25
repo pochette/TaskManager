@@ -126,8 +126,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask newSubtask, int oldId) {
-        if (!taskMap.containsKey(newSubtask.getIdTask())) {
-            System.out.println("Подзадача с ID " + newSubtask.getIdTask() + " не найдена. Обновление не выполнено.");
+        if (!taskMap.containsKey(oldId)) {
+            System.out.println("Подзадача с ID " + oldId + " не найдена. Обновление не выполнено.");
             return;
         }
 
