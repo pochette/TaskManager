@@ -164,7 +164,6 @@ public class InMemoryTaskManager implements TaskManager {
             epic.getSubtaskSet().remove(subtask.getIdTask());
             recalcEpicStatus(epic);
         }
-
         taskMap.remove(id); // Удаляем саму задачу/эпик
         historyManager.remove(id);
     }

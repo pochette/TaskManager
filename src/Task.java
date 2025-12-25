@@ -26,7 +26,6 @@ public class Task {
         this.status = status;
     }
 
-
     private static int incrementId() {
         return id++;
     }
@@ -34,7 +33,6 @@ public class Task {
     public TypesOfTask getType() {
         return TypesOfTask.TASK;
     }
-
 
     @Override
     public String toString() {
@@ -51,12 +49,6 @@ public class Task {
 
     public int getIdTask() {
         return idTask;
-    }
-
-    public void replaceTask(Task task) {
-        this.status = task.getStatus();
-        this.description = task.description;
-        this.title = task.title;
     }
 
     public String getTitle() {

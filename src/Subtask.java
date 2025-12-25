@@ -10,12 +10,12 @@ public class Subtask extends Task {
         return TypesOfTask.SUBTASK;
     }
 
-    public Subtask(String task, String description, int epicIdTask, Status status) {
-        super(task, description, status);
+    public Subtask(String title, String description, int epicIdTask, Status status) {
+        super(title, description, status);
         this.epicIdTask = epicIdTask;
     }
 
-    public Subtask(Integer id, String title, Status status, String description, int epicIdTask) {
+    public Subtask(int id, String title, Status status, String description, int epicIdTask) {
         super(id, title, status, description);
         this.epicIdTask = epicIdTask;
     }

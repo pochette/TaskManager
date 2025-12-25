@@ -7,12 +7,12 @@ public class Epic extends Task {
         super(task, description);
     }
 
-    public Epic(Integer idTask, String title, Status status, String description) {
+    public Epic(int idTask, String title, Status status, String description) {
         super(idTask, title, status, description);
     }
 
-    public void addSubtask(int idTask) {
-        subtaskSet.add(idTask);
+    public void addSubtask(int idSubtask) {
+        subtaskSet.add(idSubtask);
     }
 
     public Set<Integer> getSubtaskSet() {
