@@ -170,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // -------------------- Вспомогательное --------------------
 
-    private void recalcEpicStatus(Epic epic) {
+    public static void  recalcEpicStatus(Epic epic) {
         if (epic.getSubtaskSet().isEmpty()) {
             epic.status = Task.Status.NEW;
             return;

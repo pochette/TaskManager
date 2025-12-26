@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class TaskManagerTest<T extends TaskManager> {
 
@@ -212,10 +211,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
 
     @Test
-    void shouldUpdateSubtask (){
+    void shouldUpdateAllVariantsOfTask (){
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
         Subtask updatetedSubtask = new Subtask("update Subtask1", "update description subtask1", epic.getIdTask(), Task.Status.IN_PROGRESS);
         taskManager.updateSubtask(updatetedSubtask, subtask1.getIdTask());
 
@@ -224,5 +226,58 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2", epic.getIdTask(), Task.Status.DONE);
         taskManager.updateSubtask(updatedSubtask2,subtask1.getIdTask());
         assertEquals(updatedSubtask2, taskManager.getTaskById(subtask1.getIdTask()));
+
+        Epic updatedEpic = new Epic("updated Epic", "updated description epic");
+        taskManager.updateEpic(updatedEpic, epic.getIdTask());
+        assertEquals(updatedEpic, taskManager.getTaskById(epic.getIdTask()));
+
+        Task updatedTask1 = new Task("updated Task1", "updated description task1");
+        taskManager.updateTask(updatedTask1, task1.getIdTask());
+        assertEquals(updatedTask1, taskManager.getTaskById(task1.getIdTask()));
+
+
+    }
+
+    @Test
+    void shouldDeleteTaskById() {
+        taskManager.createEpic(epic);
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        taskManager.deleteTaskById(task1.getIdTask());
+        assertNull(taskManager.getTaskById(task1.getIdTask()), "Задача 1 должна быть удалена");
+
+        taskManager.deleteTaskById(subtask1.getIdTask());
+        assertNull(taskManager.getTaskById(subtask1.getIdTask()), "Подзадача 1 должна быть удалена");
+
+        taskManager.deleteTaskById(epic.getIdTask());
+        assertNull(taskManager.getTaskById(epic.getIdTask()), "Эпик) должен быть удален");
+        assertNull(taskManager.getTaskById(subtask1.getIdTask()), "Подзадача 1 должна быть удалена вместе с эпиком");
+        assertNull(taskManager.getTaskById(subtask2.getIdTask()), "Подзадача 2 должна быть удалена вместе с эпиком");
+    }
+    @Test
+    void shouldDeleteHistoryWhenDeleteTaskById() {
+        taskManager.createEpic(epic);
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        taskManager.getTaskById(task1.getIdTask());
+        taskManager.getTaskById(subtask1.getIdTask());
+        taskManager.getTaskById(epic.getIdTask());
+
+        assertEquals(3, taskManager.getHistoryManager().getHistory().size(), "В истории должно быть 3 задачи");
+
+        taskManager.deleteTaskById(task1.getIdTask());
+        assertEquals(2, taskManager.getHistoryManager().getHistory().size(), "В истории должно быть 2 задачи после удаления задачи 1");
+
+        taskManager.deleteTaskById(subtask1.getIdTask());
+        assertEquals(1, taskManager.getHistoryManager().getHistory().size(), "В истории должна быть 1 задача после удаления подзадачи 1");
+
+        taskManager.deleteTaskById(epic.getIdTask());
+        assertEquals(0, taskManager.getHistoryManager().getHistory().size(), "История должна быть пустой после удаления эпика");
     }
 }
