@@ -14,7 +14,6 @@ class EpicTest {
     private Epic epic;
     private Subtask subtask1;
     private Subtask subtask2;
-    private Subtask subtask3;
 
 
     @BeforeEach
@@ -22,9 +21,8 @@ class EpicTest {
         taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
         epic = new Epic("Epic 1", "Description 1");
         taskManager.createTask(epic);
-        subtask1 = new Subtask("Subtask 1", "Description 1", epic.getIdTask(), Task.Status.NEW);
-        subtask2 = new Subtask("Subtask 2", "Description 2", epic.getIdTask(), Task.Status.NEW);
-        subtask3 = new Subtask("Subtask 3", "Description 3", epic.getIdTask(), Task.Status.NEW);
+        subtask1 = new Subtask("Subtask 1", "Description 1", Task.Status.NEW, epic.getIdTask());
+        subtask2 = new Subtask("Subtask 2", "Description 2", Task.Status.NEW,  epic.getIdTask());
     }
     @AfterEach
     void tearDown() {
@@ -46,8 +44,8 @@ class EpicTest {
         taskManager.createSubtask(subtask2);
 
         //When
-        taskManager.updateSubtask(new Subtask("updated Subtask1", "updated description Subtask1", epic.getIdTask(), statusSubtask1), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask("updated Subtask2", "updated description Subtask2", epic.getIdTask(), statusSubtask2), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask("updated Subtask1", "updated description Subtask1",statusSubtask1,  epic.getIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask("updated Subtask2", "updated description Subtask2", statusSubtask2, epic.getIdTask()), subtask2.getIdTask());
         Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
 
         //Then
