@@ -1,10 +1,12 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileBackendTasksManager extends InMemoryTaskManager {
     private final Path file;
@@ -12,9 +14,11 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
     public FileBackendTasksManager(HistoryManager historyManager, Path path) {
         super(historyManager);
         this.file = path;
+        createFileIfNotExist();
+        loadFromFile(path);
     }
 
-    public static String toString(HistoryManager historyManager) {
+    public String toString(HistoryManager historyManager) {
         List<Task> taskList = historyManager.getHistory();
         StringBuilder result = new StringBuilder();
         for (Task task : taskList) {
@@ -27,85 +31,79 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         return result.toString();
     }
 
-    public static void main(String[] args) {
-        Path path = Path.of("C:/Users/burda/IdeaProjects/TaskManager/src/Backend/Backend.csv");
-        FileBackendTasksManager manager = new FileBackendTasksManager(Manager.getDefaultHistory(), path);
-        manager.createTask(new Task("task1", "desc1", Task.Status.NEW));
-        manager.createEpic(new Epic("Epic1", "epic1Description"));
-        manager.createSubtask(new Subtask("Subtask1", "subtask1Description", 2, Task.Status.NEW));
-
-        manager.getTaskById(3);
-        manager.getTaskById(2);
-        manager.getTaskById(1);
-
-        System.out.println("--- ИСХОДНЫЙ МЕНЕДЖЕР ---");
-        System.out.println(toString(manager.getHistoryManager()));
-        System.out.println(manager.getListOfAllTasks());
-
-        FileBackendTasksManager managerFromFile = loadFromFile(path);
-
-        System.out.println("\n--- ЗАГРУЖЕННЫЙ МЕНЕДЖЕР ---");
-        System.out.println(toString(managerFromFile.getHistoryManager()));
-        System.out.println(managerFromFile.getListOfAllTasks());
-
-        System.out.println("\n--- ПРОВЕРКА ---");
-        System.out.println("Задачи идентичны: " + manager.getListOfAllTasks().equals(managerFromFile.getListOfAllTasks()));
-        System.out.println("История идентична: " +
-                toString(manager.getHistoryManager()).equals(toString(managerFromFile.getHistoryManager()))
-        );
+    private void createFileIfNotExist() throws ManagerSaveException {
+        try {
+            if (!Files.exists(file)) {
+                if (!Files.exists(file.getParent())) {
+                    Files.createDirectories(file.getParent());
+                }
+                Files.createFile(file);
+                try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                    writer.write("id,type,name,status,description,epic\n");
+                }
+            }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Не удалось создать файл: " + file.toString(), e);
+        }
     }
 
-    public static FileBackendTasksManager loadFromFile(Path path) throws ManagerSaveException {
+//    public static void main(String[] args) {
+//        Path path = Path.of("src/Backend/Backend.csv");
+//        FileBackendTasksManager manager = new FileBackendTasksManager(Manager.getDefaultHistory(), path);
+//        manager.createTask(new Task("task1", "desc1", Task.Status.NEW));
+//        manager.createEpic(new Epic("Epic1", "epic1Description"));
+//        manager.createSubtask(new Subtask("Subtask1", "subtask1Description", manager.getEpicList().getLast().getIdTask(), Task.Status.NEW));
+//
+//        manager.getTaskById(3);
+//        manager.getTaskById(2);
+//        manager.getTaskById(1);
+//
+//        System.out.println("--- ИСХОДНЫЙ МЕНЕДЖЕР ---");
+//        System.out.println(toString(manager.getHistoryManager()));
+//        System.out.println(manager.getListOfAllTasks());
+//
+//        FileBackendTasksManager managerFromFile = loadFromFile(path);
+//
+//        System.out.println("\n--- ЗАГРУЖЕННЫЙ МЕНЕДЖЕР ---");
+//        System.out.println(toString(managerFromFile.getHistoryManager()));
+//        System.out.println(managerFromFile.getListOfAllTasks());
+//
+//        System.out.println("\n--- ПРОВЕРКА ---");
+//        System.out.println("Задачи идентичны: " + manager.getListOfAllTasks().equals(managerFromFile.getListOfAllTasks()));
+//        System.out.println("История идентична: " +
+//                toString(manager.getHistoryManager()).equals(toString(managerFromFile.getHistoryManager()))
+//        );
+//    }
+
+    // TODO дописать метод восстановления из файла, taskmap теперь закрыта, доступ только через create методы.
+    // дописать логику восстановления связей эпиков и сабтасков
+
+    public void loadFromFile(Path path) throws ManagerSaveException {
         if (!Files.exists(path)) {
-            throw new ManagerSaveException("Файл не найден", null);
+            return;
         }
-        FileBackendTasksManager manager = new FileBackendTasksManager(new InMemoryHistoryManager(), path);
-        int maxId = 0;
         try {
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-            boolean isHistorySection = false;
-
-            for (String line : lines) {
-                if (line.isBlank()) {
-                    isHistorySection = true;
-                    continue;
-                }
-                if (line.equals("id,type,name,status,description,epic")) {
-                    continue;
-                }
-
-                if (!isHistorySection) {
-                    Task task = formString(line);
-                    taskMap.put(task.getIdTask(), task);
-                    if (task.getIdTask() > maxId) {
-                        maxId = task.getIdTask();
-                    }
-                } else {
-                    String[] ids = line.split(",");
-                    for (String idStr : ids) {
-                        manager.historyManager.add(taskMap.get(Integer.parseInt(idStr)));
-                    }
+            List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+            for (String line : lines.stream().skip(1).collect(Collectors.toList())) {
+                Task task = taskFromLoad(line);
+                switch (task.getType()) {
+                    case TASK:
+                        super.createTask(task);
+                        break;
+                    case EPIC:
+                        super.createEpic((Epic) task);
+                        break;
+                    case SUBTASK:
+                        super.createSubtask((Subtask) task);
+                        break;
                 }
             }
-
-            // Восстанавливаем связи
-            for (Task task : taskMap.values()) {
-                if (task instanceof Subtask subtask) {
-                    Epic epic = (Epic) taskMap.get(subtask.getEpicIdTask());
-                    if (epic != null) {
-                        epic.addSubtask(subtask.getIdTask());
-                    }
-                }
-            }
-            //manager.setId(maxId + 1); // Устанавливаем следующий ID
-
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось загрузить данные из файла", e);
         }
-        return manager;
     }
 
-    public static Task formString(String value) {
+    public static Task taskFromLoad(String value) {
         String[] valuesOfFields = value.split(",");
         Integer id = Integer.parseInt(valuesOfFields[0]);
         TypesOfTask typesOfTask = TypesOfTask.valueOf(valuesOfFields[1]);
@@ -123,23 +121,16 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         };
     }
 
-    @Override
-    public String toString() {
-        return "FileBackendTasksManager{" +
-                "file=" + file +
-                ", historyManager=" + historyManager +
-                '}';
-    }
 
     private void save() throws ManagerSaveException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile(), StandardCharsets.UTF_8))) {
+        try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             writer.write("id,type,name,status,description,epic\n");
-            for (Task task : taskMap.values()) {
+            for (Task task : super.getTaskMap().values()) {
                 writer.write(taskToString(task) + "\n");
             }
 
             writer.write("\n");
-            writer.write(toString(historyManager));
+            writer.write(toString(super.getHistoryManager()));
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении в файл" + file.getFileName(), e);
@@ -173,14 +164,14 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTaskById(int id) {
-        super.deleteTaskById(id);
+    public void removeTaskById(int id) {
+        super.removeTaskById(id);
         save();
     }
 
     @Override
-    public void deleteAllTasks() {
-        super.deleteAllTasks();
+    public void removeAllTasks() {
+        super.removeAllTasks();
         save();
     }
 
@@ -221,6 +212,14 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         public ManagerSaveException(String message, Throwable cause) {
             super(message, cause);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FileBackendTasksManager{" +
+                "file=" + file +
+                ", historyManager=" + super.getHistoryManager() +
+                '}';
     }
 
 }

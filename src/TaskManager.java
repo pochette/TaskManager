@@ -1,17 +1,12 @@
 import java.util.List;
 
 public interface TaskManager {
-    // -------------------- Создание --------------------
 
     void createTask(Task task);
 
     void createSubtask(Subtask subtask);
 
     void createEpic(Epic epic);
-
-    HistoryManager getHistoryManager();
-
-    // -------------------- Получение --------------------
 
     Task getTaskById(int id);
 
@@ -21,22 +16,32 @@ public interface TaskManager {
 
     List<Subtask> getSubtaskList();
 
-    List<Subtask> getSubtasksOfEpic(Epic epic);
-
-    // -------------------- Обновление --------------------
+    List<Subtask> getSubtasksOfEpic(int epicId);
 
     void updateTask(Task newTask, int oldId);
 
     void updateEpic(Epic newEpic, int oldId);
 
     void updateSubtask(Subtask newSubtask, int oldId);
-    // -------------------- Удаление --------------------
 
-    void deleteAllTasks();
+    void recalcEpicStatus (Epic epic);
 
-    void deleteTaskById(int id);
+    void removeAllTasks();
 
-    // -------------------- Вспомогательное --------------------
+    void removeTaskById(int id);
 
-    // void recalcEpicStatus(Epic epic);
+    void removeAllEpics();
+
+    void removeEpicById(int id);
+
+    void removeAllSubtasks();
+
+    void removeSubtaskById(int id);
+
+    List<Task> getHistory();
+
+
+
+
+
 }

@@ -1,12 +1,10 @@
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +28,7 @@ class EpicTest {
     }
     @AfterEach
     void tearDown() {
-        taskManager.deleteAllTasks();
+        taskManager.removeAllTasks();
     }
 
     @MethodSource("sourceCreateEpicWithGivenParameters")
@@ -66,6 +64,58 @@ class EpicTest {
                 Arguments.of("DONE", "IN_PROGRESS", "IN_PROGRESS")
         );
     }
+
+//    @MethodSource("sourceSubtasksListForEpic")
+//    @ParameterizedTest(name = "{index} Create epic with status of subtasks = {0} and {1} should return epic status = {2}")
+//
+//
+//    void shouldCalculateStatusOfEpicCorreclty(List<Subtask> subtasks, Task.Status expectedEpicStatus) {
+//        //Given
+//        taskManager.createEpic(epic);
+//        //When
+//        for (Subtask subtask : subtasks) {
+//            taskManager.createSubtask(subtask);
+//        }
+//        Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
+//
+//        //Then
+//        assertEquals(expectedEpicStatus, actualEpicStatus, "Epic status is not calculated correctly.");
+//
+//        //
+//    }
+//
+//    private Stream <Arguments> sourceSubtasksListForEpic() {
+//        return Stream.of(
+//                Arguments.of(Collections.emptyList()),
+//                Arguments.of(List.of(
+//                        createSubtasksListForEpic(epic, Task.Status.NEW, Task.Status.NEW), Task.Status.NEW
+//                )),
+//                Arguments.of(List.of(
+//                        createSubtasksListForEpic(epic, Task.Status.DONE, Task.Status.DONE), Task.Status.DONE
+//                )),
+//                Arguments.of(List.of(
+//                        createSubtasksListForEpic(epic, Task.Status.NEW, Task.Status.DONE), Task.Status.IN_PROGRESS
+//                )),
+//                Arguments.of(List.of(
+//                        createSubtasksListForEpic(epic, Task.Status.IN_PROGRESS, Task.Status.IN_PROGRESS), Task.Status.IN_PROGRESS
+//                )),
+//                Arguments.of(List.of(
+//                        createSubtasksListForEpic(epic, Task.Status.NEW, Task.Status.IN_PROGRESS), Task.Status.IN_PROGRESS
+//                )),
+//                Arguments.of(List.of(
+//                        createSubtasksListForEpic(epic, Task.Status.DONE, Task.Status.IN_PROGRESS), Task.Status.IN_PROGRESS
+//                ))
+//        );
+//    }
+//
+//
+//    private static List<Subtask> createSubtasksListForEpic(Epic epic, Task.Status statusSubtask1, Task.Status statusSubtask2) {
+//        Subtask subtask1 = new Subtask("Subtask 1", "Description 1", epic.getIdTask(), statusSubtask1);
+//        Subtask subtask2 = new Subtask("Subtask 2", "Description 2", epic.getIdTask(), statusSubtask2);
+//        taskManager.createSubtask(subtask1);
+//        taskManager.createSubtask(subtask2);
+//        return List.of(subtask1, subtask2);
+//    }
 }
 
 
