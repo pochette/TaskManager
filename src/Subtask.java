@@ -1,25 +1,21 @@
 public class Subtask extends Task {
     private final int epicIdTask;
 
-    public Subtask(String title, String description, int epicIdTask) {
+    public Subtask(int idTask, String title, String description, Status status, int epicIdTask) {
         super(title, description);
         this.epicIdTask = epicIdTask;
     }
-    @Override
-    public TypesOfTask getType() {
-        return TypesOfTask.SUBTASK;
-    }
 
-    public Subtask(String title, String description, int epicIdTask, Status status) {
+    public Subtask(String title, String description, Status status, int epicIdTask) {
         super(title, description, status);
         this.epicIdTask = epicIdTask;
     }
 
-    public Subtask(int id, String title, Status status, String description, int epicIdTask) {
-        super(id, title, status, description);
-        this.epicIdTask = epicIdTask;
-    }
 
+    @Override
+    public TypesOfTask getType() {
+        return TypesOfTask.SUBTASK;
+    }
 
     @Override
     public String toString() {
@@ -40,7 +36,6 @@ public class Subtask extends Task {
                 subtask.getDescription() + "," +
                 subtask.getEpicIdTask();
     }
-
 
     public int getEpicIdTask() {
         return epicIdTask;

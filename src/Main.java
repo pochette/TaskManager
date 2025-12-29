@@ -12,9 +12,9 @@ public class Main {
         Epic epic1 = new Epic("Эпик 1", "Эпик с подзадачами");
         taskManager.createEpic(epic1);
 
-        Subtask sub1 = new Subtask("Подзадача 1", "К Эпику 1", epic1.getIdTask(), Task.Status.NEW );
-        Subtask sub2 = new Subtask("Подзадача 2", "К Эпику 1",  epic1.getIdTask(), Task.Status.NEW);
-        Subtask sub3 = new Subtask("Подзадача 3", "К Эпику 1",  epic1.getIdTask(), Task.Status.NEW);
+        Subtask sub1 = new Subtask("Подзадача 1", "К Эпику 1", Task.Status.NEW, epic1.getIdTask());
+        Subtask sub2 = new Subtask("Подзадача 2", "К Эпику 1", Task.Status.NEW, epic1.getIdTask());
+        Subtask sub3 = new Subtask("Подзадача 3", "К Эпику 1", Task.Status.NEW, epic1.getIdTask());
         taskManager.createSubtask(sub1);
         taskManager.createSubtask(sub2);
         taskManager.createSubtask(sub3);

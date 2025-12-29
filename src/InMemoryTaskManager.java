@@ -139,7 +139,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         taskMap.replace(oldId, newSubtask);
-
         Epic epic = (Epic) taskMap.get(newSubtask.getEpicIdTask());
         if (epic != null) {
             recalcEpicStatus(epic);

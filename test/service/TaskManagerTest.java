@@ -27,8 +27,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         epic = new Epic("Epic title", "Epic description");
 
-        subtask1 = new Subtask("Subtask1 title", "Subtask1 description", epic.getIdTask());
-        subtask2 = new Subtask("Subtask2 title", "Subtask2 description", epic.getIdTask());
+        subtask1 = new Subtask("Subtask1 title", "Subtask1 description", Task.Status.NEW, epic.getIdTask());
+        subtask2 = new Subtask( "Subtask2 title", "Subtask2 description",Task.Status.NEW, epic.getIdTask());
 
     }
     @AfterEach
@@ -111,7 +111,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", Task.Status.IN_PROGRESS, "new description Subtask1", subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.IN_PROGRESS, subtask1.getEpicIdTask()), subtask1.getIdTask());
         assertEquals(Task.Status.IN_PROGRESS, taskManager.getTaskById(epic.getIdTask()).getStatus());
     }
 
@@ -121,8 +121,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask2);
         taskManager.createSubtask(subtask1);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", Task.Status.DONE, "new description Subtask1", subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2", Task.Status.DONE, "new description Subtask2", subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", "new description Subtask1", Task.Status.DONE, subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
 
         assertEquals(Task.Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE, когда все его подзадачи выполнены.");
     }
@@ -133,8 +133,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", Task.Status.NEW, "new description Subtask1", subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2", Task.Status.NEW, "new description Subtask2", subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.NEW, subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.NEW, subtask2.getEpicIdTask()), subtask2.getIdTask());
 
         assertEquals(Task.Status.NEW, epic.getStatus(), "Статус эпика должен быть NEW, когда все его подзадачи новые.");
     }
@@ -156,8 +156,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", Task.Status.DONE, "new description Subtask1", subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2", Task.Status.DONE, "new description Subtask2", subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", "new description Subtask1",  Task.Status.DONE, subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
 
         assertEquals(Task.Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE, когда все его подзадачи завершены.");
     }
@@ -167,8 +167,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", Task.Status.NEW, "new description Subtask1", subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2", Task.Status.DONE, "new description Subtask2", subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.NEW, subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
 
         assertEquals(Task.Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS, когда его подзадачи в разных статусах.");
     }
@@ -179,8 +179,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", Task.Status.IN_PROGRESS, "new description Subtask1", subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2", Task.Status.DONE, "new description Subtask2", subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.IN_PROGRESS, subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
 
         assertEquals(Task.Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS, когда его подзадачи в разных статусах.");
     }
@@ -241,12 +241,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
-        Subtask updatetedSubtask = new Subtask("update Subtask1", "update description subtask1", epic.getIdTask(), Task.Status.IN_PROGRESS);
+        Subtask updatetedSubtask = new Subtask("update Subtask1", "update description subtask1", Task.Status.IN_PROGRESS, epic.getIdTask());
         taskManager.updateSubtask(updatetedSubtask, subtask1.getIdTask());
 
         assertEquals(updatetedSubtask, taskManager.getTaskById(subtask1.getIdTask()));
 
-        Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2", epic.getIdTask(), Task.Status.DONE);
+        Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2", Task.Status.DONE, epic.getIdTask());
         taskManager.updateSubtask(updatedSubtask2,subtask1.getIdTask());
         assertEquals(updatedSubtask2, taskManager.getTaskById(subtask1.getIdTask()));
 
