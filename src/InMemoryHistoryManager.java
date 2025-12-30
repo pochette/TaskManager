@@ -2,7 +2,7 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> historyMap = new HashMap<>();
-    private Node head;
+    private  Node head;
     private Node tail;
 
     public static String toString(HistoryManager historyManager) {

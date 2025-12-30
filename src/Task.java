@@ -1,9 +1,38 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Task {
     private static int id = 0;
-    protected final int idTask;
-    protected String title;
-    protected String description;
-    protected Status status;
+    private final int idTask;
+    private final String title;
+    private final String description;
+    private Status status;
+    private Duration duration;
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    public Task(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime, LocalDateTime endTime) {
+        this.idTask = idTask;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 
     public Task(String title, String description, Status status) {
         idTask = incrementId();
@@ -18,7 +47,6 @@ public class Task {
         this.description = description;
         this.status = Status.NEW;
     }
-
     public Task(int idTask, String title, String description, Status status) {
         this.idTask = idTask;
         this.title = title;
@@ -28,6 +56,25 @@ public class Task {
 
     private static int incrementId() {
         return id++;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime calculateEndTime(Duration duration) {
+        if (duration != null && this.getStartTime()!= null) {
+            return this.getStartTime().plus(duration);
+        }
+        return null;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public TypesOfTask getType() {
@@ -58,6 +105,11 @@ public class Task {
     public Status getStatus() {
         return this.status;
     }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
 
     public enum Status {
         NEW, DONE, IN_PROGRESS

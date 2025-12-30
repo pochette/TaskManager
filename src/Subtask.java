@@ -22,9 +22,9 @@ public class Subtask extends Task {
         return "Subtask{" +
                 "epicIdTask=" + epicIdTask +
                 ", id=" + this.getIdTask() +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
+                ", title='" + this.getTitle() + '\'' +
+                ", description='" + this.getDescription() + '\'' +
+                ", status=" + this.getStatus() +
                 '}';
     }
 
