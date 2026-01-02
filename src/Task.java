@@ -76,7 +76,10 @@ public class Task {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(title, task.title) && Objects.equals(description, task.description) && typesOfTask == task.typesOfTask && status == task.status && Objects.equals(duration, task.duration) && Objects.equals(startTime, task.startTime) && Objects.equals(endTime, task.endTime);
+        return Objects.equals(title, task.title) &&Objects.equals(idTask,task.idTask) && Objects.equals(description, task.description) && typesOfTask == task.typesOfTask && status == task.status;
+                //&& Objects.equals(duration, task.duration) &&
+//                Objects.equals(startTime, task.startTime) &&
+//                Objects.equals(endTime, task.endTime);
     }
 
     public String getDescription() {
@@ -134,7 +137,8 @@ public class Task {
     }
 
     public String toString(Task task) {
-        return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription();
+        return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription() +
+                "," + task.getDuration() + "," + task.getStartTime();
     }
 
     public enum Status {

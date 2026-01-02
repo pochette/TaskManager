@@ -16,7 +16,8 @@ public class Subtask extends Task {
     }
 
     // конструктор для восстановления из файла
-    public Subtask(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime, TypesOfTask typesOfTask, int epicIdTask) {
+    public Subtask(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime,
+                   TypesOfTask typesOfTask, int epicIdTask) {
         super(idTask, title, description, status, duration, startTime, typesOfTask);
         this.epicIdTask = epicIdTask;
     }
@@ -59,8 +60,8 @@ public class Subtask extends Task {
                 subtask.getTitle() + "," +
                 subtask.getStatus() + "," +
                 subtask.getDescription() + "," +
+                subtask.getDuration() + "," +
                 subtask.getStartTime() + "," +
-
                 subtask.getEpicIdTask();
     }
 

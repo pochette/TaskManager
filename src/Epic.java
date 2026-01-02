@@ -22,7 +22,12 @@ public class Epic extends Task {
         this.setDuration(Duration.ZERO);
     }
 
-
+    //конструктор для восстановления из файла
+    public Epic(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime,
+                TypesOfTask typesOfTask) {
+        super(idTask, title, description, status, duration, startTime, typesOfTask);
+        this.endTime = calculateEndTime(duration);
+    }
 
     public void addSubtask(Subtask subtask) {
         subtaskSet.add(subtask);
@@ -63,6 +68,8 @@ public class Epic extends Task {
         setDuration(duration);
     }
 
+
+
     public void deleteAllSubtasks() {
         subtaskSet.clear();
         calculateEndTime(this.getSubtaskSet());
@@ -72,7 +79,6 @@ public class Epic extends Task {
         subtaskSet.remove(subtask);
         calculateEndTime(this.getSubtaskSet());
     }
-
 
     @Override
     public LocalDateTime getEndTime() {
@@ -92,8 +98,19 @@ public class Epic extends Task {
         return TypesOfTask.EPIC;
     }
 
+
     @Override
     public String toString() {
-        return "Epic{" + "subtaskSet=" + subtaskSet + ", idTask=" + this.getIdTask() + ", title='" + this.getTitle() + '\'' + ", description='" + this.getDescription() + '\'' + ", status=" + this.getStatus() + '}';
+    return String.format("%d,%s,%s,%s,%s",
+            this.getIdTask(),
+            this.getType(),
+            this.getTitle(),
+            this.getStatus(),
+            this.getDescription());
     }
+
+//    @Override
+//    public String toString() {
+//        return "Epic{" + "subtaskSet=" + subtaskSet + ", idTask=" + this.getIdTask() + ", title='" + this.getTitle() + '\'' + ", description='" + this.getDescription() + '\'' + ", status=" + this.getStatus() + '}';
+//    }
 }

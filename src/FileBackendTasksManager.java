@@ -5,10 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class FileBackendTasksManager extends InMemoryTaskManager {
     private final Path file;
@@ -205,7 +202,7 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
     private void save() throws ManagerSaveException {
         try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             writer.write("id,type,name,status,description,duration,startTime,epic\n");
-            Set<Task> uniqueTasks = new HashSet<>(super.getListOfAllTasks());
+            List<Task> uniqueTasks = new ArrayList<>(super.getListOfAllTasks());
             for (Task uniqueTask : uniqueTasks) {
                 String taskToWrite = taskToString2(uniqueTask);
                 writer.write(taskToWrite + "\n");
@@ -238,22 +235,16 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
             startTime = LocalDateTime.parse(valuesOfFields[6]);
         }
 
-
         return switch (typesOfTask) {
-            case TASK -> new Task(id, title, description, status, duration, startTime,
-                    TypesOfTask.TASK);
-            case EPIC -> new Epic(id, title, status, description);
+            case TASK -> new Task(id, title, description, status, duration, startTime, TypesOfTask.TASK);
+            case EPIC -> new Epic(id, title,  description, status, duration, startTime, typesOfTask);
             case SUBTASK -> {
                 int epicId = Integer.parseInt(valuesOfFields[7]);
-                yield new Subtask(id, title, description, status, epicId);
+                yield new Subtask(id, title, description, status, duration, startTime, typesOfTask,  epicId);
             }
         };
     }
 
-    /// /                task.getEndTime().toString(),
-//                epicIdField
-//        );
-//    }
 
     //id,type,name,status,description,duration,startTime,endTime,epic
     private String taskToString2(Task task) {
@@ -287,10 +278,7 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
 
     @Override
     public String toString() {
-        return "FileBackendTasksManager{" +
-                "file=" + file +
-                ", historyManager=" + super.getHistoryManager() +
-                '}';
+        return "FileBackendTasksManager{" + "file=" + file + ", historyManager=" + super.getHistoryManager() + '}';
     }
 
     @Override
