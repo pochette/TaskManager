@@ -4,8 +4,8 @@ public class Main {
         HistoryManager historyManager = Manager.getDefaultHistory();
 
         // 1. Создание задач
-        Task task1 = new Task( "Задача 1", "Описание задачи 1", Task.Status.NEW);
-        Task task2 = new Task("Задача 2", "Описание задачи 2", Task.Status.NEW);
+        Task task1 = new Task( "Задача 1", "Описание задачи 1", Task.Status.NEW, TypesOfTask.TASK);
+        Task task2 = new Task("Задача 2", "Описание задачи 2", Task.Status.NEW, TypesOfTask.TASK);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 

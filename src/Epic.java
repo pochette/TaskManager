@@ -1,19 +1,32 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class Epic extends Task {
-    private final Set<Integer> subtaskSet = new TreeSet<>();
+    private final Set<Subtask> subtaskSet = new HashSet<>();
     private LocalDateTime endTime;
 
-
     public Epic(String task, String description) {
-        super(task, description);
+        super(task, description, Status.NEW, TypesOfTask.EPIC);
+        this.setEndTime(null);
+        this.setStartTime(null);
+        this.setDuration(Duration.ZERO);
     }
 
     public Epic(int idTask, String title, Status status, String description) {
-        super(idTask, title, description, status);
+        super(idTask, title, description, status, TypesOfTask.EPIC);
+        this.setEndTime(null);
+        this.setStartTime(null);
+        this.setDuration(Duration.ZERO);
+    }
+
+
+
+    public void addSubtask(Subtask subtask) {
+        subtaskSet.add(subtask);
+        calculateEndTime(this.getSubtaskSet());
     }
 
     public void calculateEndTime(Set<Subtask> subtaskSet) {
@@ -25,7 +38,6 @@ public class Epic extends Task {
         }
         LocalDateTime earlierStartTime = null;
         LocalDateTime latestEndTime = null;
-
 
         for (Subtask subtask : subtaskSet) {
             LocalDateTime subtaskStart = subtask.getStartTime();
@@ -43,36 +55,45 @@ public class Epic extends Task {
                 }
             }
         }
+        this.setEndTime(latestEndTime);
 
         Duration duration = earlierStartTime != null && latestEndTime != null
                 ? Duration.between(earlierStartTime, latestEndTime)
                 : Duration.ZERO;
-
-    }
-
-    public void addSubtask(int idSubtask) {
-        subtaskSet.add(idSubtask);
-    }
-
-    public void deleteSubtaskById(int idSubtask) {
-        subtaskSet.remove(idSubtask);
+        setDuration(duration);
     }
 
     public void deleteAllSubtasks() {
         subtaskSet.clear();
+        calculateEndTime(this.getSubtaskSet());
     }
 
-    public Set<Integer> getSubtaskSet() {
-        return subtaskSet;
+    public void deleteSubtaskFromSubtasksSet(Subtask subtask) {
+        subtaskSet.remove(subtask);
+        calculateEndTime(this.getSubtaskSet());
     }
+
 
     @Override
-    public String toString() {
-        return "Epic{" + "subtaskSet=" + subtaskSet + ", idTask=" + this.getIdTask() + ", title='" + this.getTitle() + '\'' + ", description='" + this.getDescription() + '\'' + ", status=" + this.getStatus() + '}';
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public Set<Subtask> getSubtaskSet() {
+        return subtaskSet;
     }
 
     @Override
     public TypesOfTask getType() {
         return TypesOfTask.EPIC;
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" + "subtaskSet=" + subtaskSet + ", idTask=" + this.getIdTask() + ", title='" + this.getTitle() + '\'' + ", description='" + this.getDescription() + '\'' + ", status=" + this.getStatus() + '}';
     }
 }
