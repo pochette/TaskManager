@@ -9,6 +9,5 @@ public class InMemoryTaskManagerTest extends TaskManagerTest <InMemoryTaskManage
     void setUp() throws IOException {
         super.setUp();
         taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
-
     }
 }

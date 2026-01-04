@@ -72,15 +72,7 @@ public class Task {
         return null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return Objects.equals(title, task.title) &&Objects.equals(idTask,task.idTask) && Objects.equals(description, task.description) && typesOfTask == task.typesOfTask && status == task.status;
-                //&& Objects.equals(duration, task.duration) &&
-//                Objects.equals(startTime, task.startTime) &&
-//                Objects.equals(endTime, task.endTime);
-    }
+
 
     public String getDescription() {
         return this.description;
@@ -96,6 +88,10 @@ public class Task {
 
     public LocalDateTime getEndTime() {
         return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public int getIdTask() {
@@ -127,13 +123,29 @@ public class Task {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return idTask == task.idTask && Objects.equals(title, task.title) && Objects.equals(description, task.description) && typesOfTask == task.typesOfTask && status == task.status && Objects.equals(duration, task.duration) && Objects.equals(startTime, task.startTime) && Objects.equals(endTime, task.endTime);
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(title, description, typesOfTask, status, duration, startTime, endTime);
+        return Objects.hash(idTask, title, description, typesOfTask, status, duration, startTime, endTime);
     }
 
     @Override
     public String toString() {
-        return "Task{" + "idTask=" + idTask + ", title='" + title + '\'' + ", description='" + description + '\'' + ", status=" + status + '}';
+        return getType()+"{" +
+                "idTask=" + idTask +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", typesOfTask=" + typesOfTask +
+                ", status=" + status +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
     }
 
     public String toString(Task task) {

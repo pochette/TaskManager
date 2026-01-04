@@ -7,7 +7,12 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Subtask> subtaskMap = new HashMap<>();// хран
 
     private final HistoryManager historyManager;
-    private final Set<Task> prioritizedTask = new TreeSet<>(Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)));
+
+    private final Set<Task> prioritizedTask = new TreeSet<>(
+            Comparator.comparing(Task::getStartTime,
+                            Comparator.nullsLast(LocalDateTime::compareTo))
+                    .thenComparing(Task::getIdTask)  // Добавляем вторичную сортировку по ID
+    );
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -16,6 +21,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpic(Epic epic) {
         epicMap.put(epic.getIdTask(), epic);
+        if(epic.getStartTime() != null) {
+            prioritizedTask.add(epic);
+        }
         prioritizedTask.add(epic);
     }
 
@@ -187,12 +195,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllTypesOfTasks() {
-        taskMap.clear();
-        epicMap.clear();
-        subtaskMap.clear();
-        historyManager.getHistory().clear();
+        removeAllTasks();
+        removeAllSubtasks();
+        removeAllEpics();
         prioritizedTask.clear();
-
     }
 
     @Override
@@ -223,7 +229,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         Epic epic = epicMap.get(subtaskToRemove.getEpicIdTask());
         if (epic != null) {
-            epic.getSubtaskSet().remove(subtaskToRemove);
+            epic.deleteSubtaskFromSubtasksSet(subtaskToRemove);
             recalcEpicStatus(epic);
         }
         prioritizedTask.remove(subtaskToRemove);
@@ -241,7 +247,6 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTask.remove(taskToRemove);
         taskMap.remove(id); // Удаляем саму задачу/эпик
         historyManager.remove(id);
-
     }
 
     @Override
@@ -259,9 +264,9 @@ public class InMemoryTaskManager implements TaskManager {
         // статус пересчитывается только по сабтаскам
         recalcEpicStatus(newEpic);
         epicMap.replace(oldId, newEpic);
-        prioritizedTask.remove(oldEpic);
-        prioritizedTask.add(newEpic);
-    }
+}
+
+
 
     @Override
     public void updateSubtask(Subtask newSubtask, int oldId) {
@@ -275,7 +280,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epicMap.get(newSubtask.getEpicIdTask());
         if (epic != null) {
             recalcEpicStatus(epic);
-            prioritizedTask.add(epic);
+            epic.calculateEndTime();
         }
     }
 

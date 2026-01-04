@@ -1,19 +1,22 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasksManager> {
     private static final Path FILE_PATH = Path.of("src/Backend/Backend.csv");
-    private static final Path TEST_FILE_PATH = Path.of("src/Backend/TestBackend.csv" );
+    private static final Path TEST_FILE_PATH = Path.of("src/Backend/TestBackend.csv");
 
     void clearCSVFile() throws IOException {
         Path filePath = FILE_PATH;
@@ -107,7 +110,7 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
         List<String> lines = Files.readAllLines(FILE_PATH);
 
         // The last non-empty line should be the history line
-        String historyLine = lines.getLast() ;
+        String historyLine = lines.getLast();
         String[] historyIds = historyLine.split(",");
 
         HistoryManager historyManager = taskManager.getHistoryManager();
@@ -130,9 +133,10 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
         assertEquals(0, historyManager.getHistory().size(), "History should be empty after removing epic and its subtask");
         assertFalse(historyManager.getHistory().contains(subtask1.getIdTask()));
     }
-//
+
+    //
     @Test
-    void  test5_shouldTestLoadingFromFileAndRemovingAllOfTypeTask() {
+    void test5_shouldTestLoadingFromFileAndRemovingAllOfTypeTask() {
         taskManager.createTask(task1);
         taskManager.createTask(task2);
         taskManager.createEpic(epic);
@@ -187,14 +191,9 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
 
             //Remove allTask
             taskManager.removeAllTasks();
-            linesFromFile= Files.readAllLines(FILE_PATH);
+            linesFromFile = Files.readAllLines(FILE_PATH);
             assertEquals(2, linesFromFile.size(), "Should left only one line with values");
             assertEquals("id,type,name,status,description,duration,startTime,epic", linesFromFile.getFirst());
-
-
-
-
-
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -221,11 +220,21 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
                 taskManager2.getEpicById(9782).toString(taskManager2.getEpicById(9782)));
 
         assertEquals("983,SUBTASK,Subtask 983 title,NEW,Subtask 983 description,PT360H,2026-01-01T10:00,2",
-                taskManager2.getSubtaskById(983).toString(taskManager2.getSubtaskById(983)) );
-
-
-
+                taskManager2.getSubtaskById(983).toString(taskManager2.getSubtaskById(983)));
 
     }
 
+    @Test
+    void test7_shouldThrowManagerSaveException() {
+        assertThrows(FileBackendTasksManager.ManagerSaveException.class, () -> {
+            FileBackendTasksManager failedTaskManager = new FileBackendTasksManager(Manager.getDefaultHistory(), Paths.get("..."));
+            failedTaskManager.createTask(task1);
+        });
+
+        assertThrows(FileBackendTasksManager.ManagerSaveException.class, () -> {
+            FileBackendTasksManager failedTaskManager = new FileBackendTasksManager(Manager.getDefaultHistory(), Paths.get("..."));
+            failedTaskManager.loadFromFile(Paths.get("..."));
+        });
+        //createFileIfNotExist() test
+    }
 }

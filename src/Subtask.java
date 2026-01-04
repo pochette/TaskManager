@@ -65,14 +65,14 @@ public class Subtask extends Task {
                 subtask.getEpicIdTask();
     }
 
-    @Override
-    public String toString() {
-        return "Subtask{" +
-                "epicIdTask=" + this.getEpicIdTask() +
-                ", id=" + this.getIdTask() +
-                ", title='" + this.getTitle() + '\'' +
-                ", description='" + this.getDescription() + '\'' +
-                ", status=" + this.getStatus() +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Subtask{" +
+//                "epicIdTask=" + this.getEpicIdTask() +
+//                ", id=" + this.getIdTask() +
+//                ", title='" + this.getTitle() + '\'' +
+//                ", description='" + this.getDescription() + '\'' +
+//                ", status=" + this.getStatus() +
+//                '}';
+//    }
 }

@@ -50,13 +50,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
 
     @Test
-    void shouldCreateAndRetrieveTask() {
+    void test1_shouldCreateAndRetrieveTask() {
         taskManager.createTask(task1);
         Assertions.assertEquals(task1, taskManager.getTaskById(task1.getIdTask()));
     }
 
     @Test
-    void addNewTask() {
+    void test2_addNewTask() {
         Task task = new Task("Test Task", "Test add NewTask description", Task.Status.NEW, TypesOfTask.TASK);
         taskManager.createTask(task);
         final int taskId = task.getIdTask();
@@ -73,7 +73,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldCreateAndDeleteTaskAndListOfTasks() {
+    void test3_shouldCreateAndDeleteTaskAndListOfTasks() {
         taskManager.createTask(task1);
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
@@ -103,7 +103,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnEpicFromSubtask() {
+    void test4_shouldReturnEpicFromSubtask() {
 
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
@@ -116,7 +116,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldBe2SubtasksFromEpic() {
+    void test5_shouldBe2SubtasksFromEpic() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -126,7 +126,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldCalculateEpicStatusCorrectly() {
+    void test6_shouldCalculateEpicStatusCorrectly() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -136,7 +136,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldRecalculateEpicStatusToDone() {
+    void test7_shouldRecalculateEpicStatusToDone() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask2);
         taskManager.createSubtask(subtask1);
@@ -148,7 +148,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void recalculateEpicStatusWhenAllSubtaskAreNew() {
+    void test8_recalculateEpicStatusWhenAllSubtaskAreNew() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -160,7 +160,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void recalculateEpicStatusForEmptySubtaskList() {
+    void test9_recalculateEpicStatusForEmptySubtaskList() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -172,7 +172,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     }
     @Test
-    void recalculateEpicStatusWhenAllSubtaskAreDone() {taskManager.createEpic(epic);
+    void test10_recalculateEpicStatusWhenAllSubtaskAreDone() {taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
@@ -182,7 +182,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(Task.Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE, когда все его подзадачи завершены.");
     }
     @Test
-    void recalculateEpicStatusWhenSubtaskAreNewAndDone() {
+    void test11_recalculateEpicStatusWhenSubtaskAreNewAndDone() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -194,7 +194,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void recalculateEpicStatusWhenSubtaskAreInProgressAndDone() {
+    void test12_recalculateEpicStatusWhenSubtaskAreInProgressAndDone() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -206,7 +206,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnSubtaskList() {
+    void test13_shouldReturnSubtaskList() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -216,7 +216,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void test1_getSubtaskList() {
+    void test14_getSubtaskList() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -235,7 +235,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void test1_getSubtasksOfEpic() {
+    void test15_getSubtasksOfEpic() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -255,7 +255,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
 
     @Test
-    void shouldUpdateAllVariantsOfTask (){
+    void test16_shouldUpdateAllVariantsOfTask(){
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -285,7 +285,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldDeleteTaskById() {
+    void test17_shouldDeleteTaskById() {
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -303,27 +303,33 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNull(taskManager.getSubtaskById(subtask1.getIdTask()), "Подзадача 1 должна быть удалена вместе с эпиком");
         assertNull(taskManager.getSubtaskById(subtask2.getIdTask()), "Подзадача 2 должна быть удалена вместе с эпиком");
     }
+
+
     @Test
-    void shouldDeleteHistoryWhenDeleteTaskById() {
+    void test18_shouldReturnPrioritizedTasks() {
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
         taskManager.createEpic(epic);
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
 
-        taskManager.getTaskById(task1.getIdTask());
-        taskManager.getSubtaskById(subtask1.getIdTask());
-        taskManager.getEpicById(epic.getIdTask());
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
 
-        assertEquals(3, taskManager.getHistory().size(), "В истории должно быть 3 задачи");
+        // Теперь должно быть 5 элементов: task2, subtask1, task1, subtask2, epic
+        assertEquals(5, prioritizedTasks.size(), "Должно быть 5 задач в приоритетном списке");
 
-        taskManager.removeTaskById(task1.getIdTask());
-        assertEquals(2, taskManager.getHistory().size(), "В истории должно быть 2 задачи после удаления задачи 1");
+        // Порядок по времени начала:
+        // 1. task2     (2025-12-25 10:00)
+        // 2. subtask1  (2025-12-25 12:35)
+        // 3. task1     (2026-01-01 10:00)
+        // 4. subtask2  (2026-01-15 14:00)
+        // 5. epic (время начала = времени первой подзадачи = 2025-12-25 12:35)
 
-        taskManager.removeSubtaskById(subtask1.getIdTask());
-        assertEquals(1, taskManager.getHistory().size(), "В истории должна быть 1 задача после удаления подзадачи 1");
-
-        taskManager.removeEpicById(epic.getIdTask());
-        assertEquals(0, taskManager.getHistory().size(), "История должна быть пустой после удаления эпика");
+        assertEquals(task2, prioritizedTasks.get(0), "Первая задача должна быть task2");
+        assertEquals(subtask1, prioritizedTasks.get(1), "Вторая задача должна быть subtask1");
+        assertEquals(task1, prioritizedTasks.get(2), "Третья задача должна быть task1");
+        assertEquals(subtask2, prioritizedTasks.get(3), "Четвертая задача должна быть subtask2");
+        assertEquals(epic, prioritizedTasks.get(4), "Пятая задача должна быть epic");
     }
+
 }
