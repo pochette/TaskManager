@@ -3,13 +3,13 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private static final LocalDateTime NO_TIME = LocalDateTime.of(1, 1, 1, 1, 1);
+    private static final String timeOverLapError = "Новая задача пересекается по времени с уже существующими задачами";
     private final Map<Integer, Task> taskMap = new HashMap<>();// хранение Task
     private final Map<Integer, Epic> epicMap = new HashMap<>();// хранение Epic
     private final Map<Integer, Subtask> subtaskMap = new HashMap<>();// хранение Subtask
     private final HistoryManager historyManager;
-    private final Set<Task> prioritizedTask = new TreeSet<>(
-            Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)).
-                    thenComparing(Task::getIdTask));
+    private final Set<Task> prioritizedTasks = new TreeSet<>(
+            Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)));
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -17,7 +17,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected void addTaskByPriority(Task task) {
         if (task.getStartTime() != null && !task.getStartTime().equals(NO_TIME)) {
-            prioritizedTask.add(task);
+            prioritizedTasks.add(task);
         }
     }
 
@@ -27,7 +27,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createSubtask(Subtask subtask) {
+    public void createSubtask(Subtask subtask) throws TaskTimeOverLapException {
+        if (!isNoOverLap(subtask)) {
+            throw new TaskTimeOverLapException(timeOverLapError);
+        }
         Epic epic = epicMap.get(subtask.getEpicIdTask());
         if (epic == null) {
             System.out.println("Эпик этого сабтаска не найден.");
@@ -37,12 +40,13 @@ public class InMemoryTaskManager implements TaskManager {
         recalcEpicStatus(epic);
         subtaskMap.put(subtask.getIdTask(), subtask);
         addTaskByPriority(subtask);
-        prioritizedTask.remove(epic);
-        addTaskByPriority(epic);
     }
 
     @Override
     public void createTask(Task task) {
+        if (!isNoOverLap(task)) {
+            throw new TaskTimeOverLapException(timeOverLapError);
+        }
         taskMap.put(task.getIdTask(), task);
         addTaskByPriority(task);
     }
@@ -78,7 +82,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        return new ArrayList<>(prioritizedTask);
+        return List.copyOf(prioritizedTasks);
     }
 
     @Override
@@ -123,6 +127,40 @@ public class InMemoryTaskManager implements TaskManager {
         return taskMap;
     }
 
+//    private boolean isNoOverLap(Task task) {
+//        LocalDateTime start = task.getStartTime();
+//        LocalDateTime end = task.getEndTime();
+//        if (start.equals(NO_TIME)) return true;
+//        return prioritizedTask.stream()
+//                .allMatch(taskPrior -> (
+//                        taskPrior.getStartTime().isEqual(start) &&
+//                                taskPrior.getStartTime().isAfter(end) ||
+//                                taskPrior.getStartTime().isEqual(end) ||
+//                                taskPrior.getEndTime().isBefore(start) ||
+//                                taskPrior.getEndTime().isEqual(start) ||
+//                                taskPrior.getEndTime().isEqual(end)));
+//    }
+
+    private boolean isNoOverLap(Task task) { // Проверка на пересечение по времени задачи и уже имеющихся приоритезированных задач
+        LocalDateTime start = task.getStartTime();
+        LocalDateTime end = task.getEndTime();
+        if (start.isEqual(NO_TIME))
+            return true; // Задачи без времени не попадают в проверку и не будут учтены при приоритезации
+        // Для каждой приоритезированной задачи проверяем попадает ли новая задача во временные рамки
+        if (!prioritizedTasks.isEmpty()) {
+            return prioritizedTasks.stream()
+                    .allMatch(taskPrior -> (taskPrior.getStartTime().isEqual(start) &&
+                            taskPrior.getEndTime().isEqual(end)) ||
+                            taskPrior.getStartTime().isAfter(end) ||
+                            taskPrior.getStartTime().isEqual(end) ||
+                            taskPrior.getEndTime().isBefore(start) ||
+                            taskPrior.getEndTime().isEqual(start));
+        } else {
+            return true;
+        }
+    }
+
+
     @Override
     public void recalcEpicStatus(Epic epic) {
         if (epic.getSubtaskSet().isEmpty()) {
@@ -161,10 +199,9 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epicMap.get(i);
             for (Subtask subtask : epic.getSubtaskSet()) {
                 historyManager.remove(subtask.getIdTask());
-                prioritizedTask.remove(subtask);
+                prioritizedTasks.remove(subtask);
                 subtaskMap.remove(subtask.getIdTask());
             }
-            prioritizedTask.remove(epic);
             historyManager.remove(i);
         }
         epicMap.clear();
@@ -177,9 +214,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Task task : historyList) {
             if (task instanceof Subtask subtask) {
                 historyManager.remove(subtask.getIdTask());
-                prioritizedTask.remove(subtask);
-                prioritizedTask.remove(epicMap.get(subtask.getEpicIdTask()));
-                addTaskByPriority(epicMap.get(subtask.getEpicIdTask()));
+                prioritizedTasks.remove(subtask);
             }
         }
         subtaskMap.clear();
@@ -190,7 +225,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Task task : historyManager.getHistory()) {
             if (!(task instanceof Epic) && !(task instanceof Subtask)) {
                 historyManager.remove(task.getIdTask());
-                prioritizedTask.remove(task);
+                prioritizedTasks.remove(task);
             }
         }
         taskMap.clear();
@@ -202,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager {
         removeAllTasks();
         removeAllSubtasks();
         removeAllEpics();
-        prioritizedTask.clear();
+        prioritizedTasks.clear();
     }
 
     @Override
@@ -212,17 +247,17 @@ public class InMemoryTaskManager implements TaskManager {
             while (iterator.hasNext()) {
                 Subtask subtask = iterator.next();
                 if (subtaskMap.get(subtask.getIdTask()) != null) {
-                    prioritizedTask.remove(subtaskMap.get(subtask.getIdTask()));
+                    prioritizedTasks.remove(subtaskMap.get(subtask.getIdTask()));
                     historyManager.remove(subtask.getIdTask());
                     subtaskMap.remove(subtask.getIdTask());
                 }
             }
-            prioritizedTask.remove(epicMap.get(id));
             historyManager.remove(id);
             epicMap.get(id).deleteAllSubtasks();
             epicMap.remove(id);
         }
     }
+
 
     @Override
     public void removeSubtaskById(int id) {
@@ -236,10 +271,8 @@ public class InMemoryTaskManager implements TaskManager {
             epic.deleteSubtaskFromSubtasksSet(subtaskToRemove);
             recalcEpicStatus(epic);
             epic.calculateEndTime();
-            prioritizedTask.remove(epic);
-            addTaskByPriority(epic);
         }
-        prioritizedTask.remove(subtaskToRemove);
+        prioritizedTasks.remove(subtaskToRemove);
         historyManager.remove(id);
         subtaskMap.remove(id);
 
@@ -251,7 +284,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskToRemove == null) {
             System.out.println("Задача с ID " + id + " не найдена. Удаление не выполнено.");
         }
-        prioritizedTask.remove(taskToRemove);
+        prioritizedTasks.remove(taskToRemove);
         taskMap.remove(id); // Удаляем саму задачу/эпик
         historyManager.remove(id);
     }
@@ -279,22 +312,26 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Подзадача с ID " + oldId + " не найдена. Обновление не выполнено.");
             return;
         }
+        if(!isNoOverLap(newSubtask)) {
+            throw new TaskTimeOverLapException(timeOverLapError);
+        }
         subtaskMap.replace(oldId, newSubtask);
-        prioritizedTask.remove(subtaskMap.get(oldId));
+        prioritizedTasks.remove(subtaskMap.get(oldId));
         addTaskByPriority(newSubtask);
         Epic epic = epicMap.get(newSubtask.getEpicIdTask());
         if (epic != null) {
             recalcEpicStatus(epic);
             epic.calculateEndTime();
-            prioritizedTask.remove(epic);
-            addTaskByPriority(epic);
         }
     }
 
     @Override
     public void updateTask(Task newTask, int oldId) {
+        if(!isNoOverLap(newTask)) {
+            throw new TaskTimeOverLapException(timeOverLapError);
+        }
         taskMap.replace(oldId, newTask);
-        prioritizedTask.remove(taskMap.get(oldId));
+        prioritizedTasks.remove(taskMap.get(oldId));
         addTaskByPriority(newTask);
     }
 }

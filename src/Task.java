@@ -7,9 +7,9 @@ public class Task {
     private final int idTask;
     private final String title;
     private final String description;
-    private Status status;
     protected Duration duration;
     protected LocalDateTime startTime;
+    private Status status;
 
     public Task(String title, String description, Status status, Duration duration, LocalDateTime startTime) {
         this.idTask = incrementId();
@@ -31,9 +31,6 @@ public class Task {
         this.startTime = startTime;
     }
 
-
-
-
     private static int incrementId() {
         return id++;
     }
@@ -45,7 +42,12 @@ public class Task {
         return null;
     }
 
-
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return idTask == task.idTask;
+    }
 
     public String getDescription() {
         return this.description;
@@ -55,11 +57,9 @@ public class Task {
         return duration;
     }
 
-
     public LocalDateTime getEndTime() {
         return startTime.plus(duration);
     }
-
 
     public int getIdTask() {
         return idTask;
@@ -90,20 +90,13 @@ public class Task {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return idTask == task.idTask;
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(idTask);
     }
 
     @Override
     public String toString() {
-        return getType()+"{" +
+        return getType() + "{" +
                 "idTask=" + idTask +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

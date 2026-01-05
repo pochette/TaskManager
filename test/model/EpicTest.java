@@ -22,15 +22,14 @@ class EpicTest {
     void setUp() {
         taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
         epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
-        taskManager.createTask(epic);
-        subtask1 = new Subtask("Subtask 1", "Description 1", Task.Status.NEW, Duration.ofDays(43),
-                LocalDateTime.of(2026,1,4,4,56), epic.getIdTask());
-        subtask2 = new Subtask("Subtask 2 title", "Description Subtask2", Task.Status.NEW, Duration.ofHours(56),
-                LocalDateTime.of(2026,1,5,6,34), epic.getIdTask());
+        subtask1 = new Subtask("Subtask 1", "Description 1", Task.Status.NEW,
+                Duration.ofDays(43), LocalDateTime.of(2024,1,4,4,56), epic.getIdTask());
+        subtask2 = new Subtask("Subtask 2 title", "Description Subtask2", Task.Status.NEW,
+                Duration.ofHours(56), LocalDateTime.of(2026,1,5,6,34), epic.getIdTask());
     }
     @AfterEach
     void tearDown() {
-        taskManager.removeAllTasks();
+        taskManager.removeAllTypesOfTasks();
     }
 
     @MethodSource("sourceCreateEpicWithGivenParameters")
@@ -48,15 +47,16 @@ class EpicTest {
         taskManager.createSubtask(subtask2);
 
         //When
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "updated Subtask1", "updated description Subtask1", statusSubtask1, Duration.ofHours(56), LocalDateTime.of(2026,1,6,13,56), epic.getIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "updated Subtask1", "updated description Subtask1", statusSubtask1, Duration.ofHours(56), LocalDateTime.of(2027,1,6,13,56), epic.getIdTask()), subtask1.getIdTask());
 
 
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "updated Subtask2", "updated description Subtask2", statusSubtask2, Duration.ofHours(5), LocalDateTime.of(2026,2,3,14,57), epic.getIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "updated Subtask2", "updated description Subtask2", statusSubtask2, Duration.ofHours(5), LocalDateTime.of(2028,2,3,14,57), epic.getIdTask()), subtask2.getIdTask());
 
-        Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
+        Task.Status actualEpicStatus = taskManager.getEpicById(epic.getIdTask()).getStatus();
 
         //Then
         assertEquals(expectedEpicStatus, actualEpicStatus, "Epic status is not calculated correctly.");
+
     }
 
     private static Stream<Arguments> sourceCreateEpicWithGivenParameters() {
