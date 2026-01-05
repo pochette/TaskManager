@@ -7,59 +7,32 @@ public class Task {
     private final int idTask;
     private final String title;
     private final String description;
-    private final TypesOfTask typesOfTask;
     private Status status;
-    private Duration duration;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
-    public Task(String title, String description, TypesOfTask typesOfTask, Status status, Duration duration, LocalDateTime startTime) {
+    public Task(String title, String description, Status status, Duration duration, LocalDateTime startTime) {
         this.idTask = incrementId();
         this.title = title;
         this.description = description;
-        this.typesOfTask = typesOfTask;
         this.status = status;
         this.duration = duration;
         this.startTime = startTime;
-        this.endTime = calculateEndTime(duration);
     }
 
     // конструктор для восстановления из файла
     public Task(int idTask, String title, String description, Status status, Duration duration,
-                LocalDateTime startTime, TypesOfTask typesOfTask) {
+                LocalDateTime startTime) {
         this.idTask = idTask;
         this.title = title;
         this.description = description;
         this.status = status;
         this.duration = duration;
         this.startTime = startTime;
-        this.typesOfTask = typesOfTask;
-        this.endTime = calculateEndTime(duration);
     }
 
-    public Task(String title, String description, Status status, TypesOfTask typesOfTask) {
-        this.idTask = incrementId();
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.typesOfTask = typesOfTask;
-    }
 
-    public Task(String title, String description) {
-        this.idTask = incrementId();
-        this.title = title;
-        this.description = description;
-        this.status = Status.NEW;
-        this.typesOfTask = TypesOfTask.TASK;
-    }
 
-    public Task(int idTask, String title, String description, Status status, TypesOfTask typesOfTask) {
-        this.idTask = idTask;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.typesOfTask = typesOfTask;
-    }
 
     private static int incrementId() {
         return id++;
@@ -82,17 +55,11 @@ public class Task {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
 
     public LocalDateTime getEndTime() {
-        return endTime;
+        return startTime.plus(duration);
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
 
     public int getIdTask() {
         return idTask;
@@ -119,19 +86,19 @@ public class Task {
     }
 
     public TypesOfTask getType() {
-        return typesOfTask;
+        return TypesOfTask.TASK;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return idTask == task.idTask && Objects.equals(title, task.title) && Objects.equals(description, task.description) && typesOfTask == task.typesOfTask && status == task.status && Objects.equals(duration, task.duration) && Objects.equals(startTime, task.startTime) && Objects.equals(endTime, task.endTime);
+        return idTask == task.idTask;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idTask, title, description, typesOfTask, status, duration, startTime, endTime);
+        return Objects.hash(idTask);
     }
 
     @Override
@@ -140,11 +107,11 @@ public class Task {
                 "idTask=" + idTask +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", typesOfTask=" + typesOfTask +
+                ", typesOfTask=" + getType() +
                 ", status=" + status +
                 ", duration=" + duration +
                 ", startTime=" + startTime +
-                ", endTime=" + endTime +
+                ", endTime=" + getEndTime() +
                 '}';
     }
 

@@ -4,28 +4,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Epic extends Task {
+    private static final LocalDateTime NULL_TIME = LocalDateTime.of(1, 1, 1, 1, 1);
     private final Set<Subtask> subtaskSet = new HashSet<>();
-//    private LocalDateTime endTime;
+    private LocalDateTime endTime;
 
-    public Epic(String task, String description) {
-        super(task, description, Status.NEW, TypesOfTask.EPIC);
-        this.setEndTime(null);
-        this.setStartTime(null);
-        this.setDuration(Duration.ZERO);
-    }
-
-    public Epic(int idTask, String title, Status status, String description) {
-        super(idTask, title, description, status, TypesOfTask.EPIC);
-        this.setEndTime(null);
-        this.setStartTime(null);
-        this.setDuration(Duration.ZERO);
+    public Epic(String title, Status status, String description) {
+        super(title, description, status, Duration.ZERO, NULL_TIME);
+        this.endTime = NULL_TIME;
     }
 
     //конструктор для восстановления из файла
-    public Epic(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime,
-                TypesOfTask typesOfTask) {
-        super(idTask, title, description, status, duration, startTime, typesOfTask);
-        setEndTime(calculateEndTime(duration));
+    public Epic(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime) {
+        super(idTask, title, description, status, duration, startTime);
+        setTimeFields(startTime, NULL_TIME, duration);
+        calculateEndTime();
     }
 
     public void addSubtask(Subtask subtask) {
@@ -35,38 +27,34 @@ public class Epic extends Task {
 
     public void calculateEndTime() {
         if (this.getSubtaskSet().isEmpty()) {
-            this.setEndTime(null);
-            this.setStartTime(null);
-            this.setDuration(Duration.ZERO);
+            setTimeFields(NULL_TIME,NULL_TIME,Duration.ZERO);
             return;
         }
 
-        LocalDateTime earlierStartTime = null;
-        LocalDateTime latestEndTime = null;
+        LocalDateTime earlierStartTime = NULL_TIME;
+        LocalDateTime latestEndTime = NULL_TIME;
 
         for (Subtask subtask : subtaskSet) {
             LocalDateTime subtaskStart = subtask.getStartTime();
             Duration subtaskDuration = subtask.getDuration();
 
-            if (subtaskStart != null) {
-                if (earlierStartTime == null || subtaskStart.isBefore(earlierStartTime)) {
+            if (subtaskStart != NULL_TIME) {
+                if (earlierStartTime == NULL_TIME || subtaskStart.isBefore(earlierStartTime)) {
                     earlierStartTime = subtaskStart;
                 }
             }
-            if (subtaskStart != null && subtaskDuration != null) {
+            if (subtaskStart != NULL_TIME && subtaskDuration != Duration.ZERO) {
                 LocalDateTime endSubtask = subtaskStart.plus(subtaskDuration);
-                if (latestEndTime == null || latestEndTime.isBefore(endSubtask)) {
+                if (latestEndTime == NULL_TIME || latestEndTime.isBefore(endSubtask)) {
                     latestEndTime = endSubtask;
                 }
             }
         }
-        this.setEndTime(latestEndTime);
-        this.setStartTime(earlierStartTime);
 
-        Duration duration = earlierStartTime != null && latestEndTime != null
+        Duration duration = earlierStartTime != NULL_TIME && latestEndTime != NULL_TIME
                 ? Duration.between(earlierStartTime, latestEndTime)
                 : Duration.ZERO;
-        setDuration(duration);
+        setTimeFields(earlierStartTime, latestEndTime,duration);
     }
 
     public void deleteAllSubtasks() {
@@ -81,15 +69,16 @@ public class Epic extends Task {
 
     @Override
     public Duration getDuration() {
-        if(subtaskSet.isEmpty()) {
+        if (subtaskSet.isEmpty()) {
             return Duration.ZERO;
         }
         return super.getDuration();
     }
+
     @Override
     public LocalDateTime getEndTime() {
         if (subtaskSet.isEmpty()) {
-            return null;
+            return NULL_TIME;
         }
         return super.getEndTime();
     }
@@ -97,7 +86,7 @@ public class Epic extends Task {
     @Override
     public LocalDateTime getStartTime() {
         if (subtaskSet.isEmpty()) {
-            return null;
+            return NULL_TIME;
         }
         return super.getStartTime();
     }
@@ -111,7 +100,12 @@ public class Epic extends Task {
         return TypesOfTask.EPIC;
     }
 
+    private void setTimeFields(LocalDateTime startTime, LocalDateTime endTime, Duration duration) {
+        this.endTime = endTime;
+        this.startTime = startTime;
+        this.duration = duration;
 
+    }
 
 //    @Override
 //    public String toString() {

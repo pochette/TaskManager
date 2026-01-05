@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.temporal.ChronoUnit.HOURS;
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class TaskManagerTest<T extends TaskManager> {
@@ -21,24 +22,24 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @BeforeEach
     void setUp() throws IOException {
 
-        task1 = new Task("Task1 title", "Task1 Description", TypesOfTask.TASK, Task.Status.NEW,
+        task1 = new Task("Task1 title", "Task1 Description", Task.Status.NEW,
                 Duration.ofDays(15), LocalDateTime.of(2026, 1, 1, 10, 0));
-        task2 = new Task( "Task2 title", "Task2 Description", TypesOfTask.TASK, Task.Status.NEW,
+        task2 = new Task( "Task2 title", "Task2 Description", Task.Status.NEW,
                 Duration.ofDays(10), LocalDateTime.of(2025, 12, 25, 10, 0));
 
-        epic = new Epic( "Epic title", "Epic description");
+        epic = new Epic("Epic title", Task.Status.NEW, "Epic description" );
 
         subtask1 = new Subtask(
                                 "Subtask1 title",
                                 "Subtask1 description",
-                TypesOfTask.SUBTASK,
+               
                 Task.Status.NEW,
                 Duration.ofDays(30),
                 LocalDateTime.of(2025, 12, 25,12,35), epic.getIdTask());
         subtask2 = new Subtask(
                                 "Subtask2 title",
                                 "Subtask2 description",
-                TypesOfTask.SUBTASK,
+               
                 Task.Status.NEW,
                 Duration.ofDays(20),
                 LocalDateTime.of(2026, 1, 15,14,0), epic.getIdTask());
@@ -57,7 +58,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test2_addNewTask() {
-        Task task = new Task("Test Task", "Test add NewTask description", Task.Status.NEW, TypesOfTask.TASK);
+        Task task = new Task("Task1 title", "Task1 Description", Task.Status.NEW,
+                Duration.ofDays(15), LocalDateTime.of(2026, 1, 1, 10, 0));
         taskManager.createTask(task);
         final int taskId = task.getIdTask();
         final Task savedTask = taskManager.getTaskById(taskId);
@@ -131,7 +133,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.IN_PROGRESS, subtask1.getEpicIdTask()), subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+                "new title Subtask1",
+                "new description Subtask1",
+                Task.Status.IN_PROGRESS, Duration.ofHours(72),
+                LocalDateTime.of(2025, 12, 25, 11, 43),
+                
+                subtask1.getEpicIdTask()), subtask1.getIdTask() );
         assertEquals(Task.Status.IN_PROGRESS, taskManager.getEpicById(epic.getIdTask()).getStatus());
     }
 
@@ -141,8 +149,20 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask2);
         taskManager.createSubtask(subtask1);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", "new description Subtask1", Task.Status.DONE, subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+                "new title Subtask1",
+                "new description Subtask1",
+                Task.Status.DONE, Duration.ofHours(72),
+                LocalDateTime.of(2025, 12, 25, 11, 43),
+                
+                subtask1.getEpicIdTask()), subtask1.getIdTask() );
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+                "new title Subtask2",
+                "new description Subtask2",
+                Task.Status.DONE, Duration.ofHours(102),
+                LocalDateTime.of(2025, 11, 25, 11, 43),
+                
+                subtask2.getEpicIdTask()), subtask2.getIdTask() );
 
         assertEquals(Task.Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE, когда все его подзадачи выполнены.");
     }
@@ -153,8 +173,20 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.NEW, subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.NEW, subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+                "new title Subtask1",
+                "new description Subtask1",
+                Task.Status.NEW, Duration.ofHours(72),
+                LocalDateTime.of(2025, 12, 25, 11, 43),
+                
+                subtask1.getEpicIdTask()), subtask1.getIdTask() );
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+                "new title Subtask2",
+                "new description Subtask2",
+                Task.Status.NEW, Duration.ofHours(102),
+                LocalDateTime.of(2025, 11, 25, 11, 43),
+                
+                subtask2.getEpicIdTask()), subtask2.getIdTask() );
 
         assertEquals(Task.Status.NEW, epic.getStatus(), "Статус эпика должен быть NEW, когда все его подзадачи новые.");
     }
@@ -176,8 +208,20 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1", "new description Subtask1",  Task.Status.DONE, subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+                "new title Subtask1",
+                "new description Subtask1",
+                Task.Status.DONE, Duration.ofHours(72),
+                LocalDateTime.of(2025, 12, 25, 11, 43),
+                
+                subtask1.getEpicIdTask()), subtask1.getIdTask() );
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+                "new title Subtask2",
+                "new description Subtask2",
+                Task.Status.DONE, Duration.ofHours(102),
+                LocalDateTime.of(2025, 11, 25, 11, 43),
+                
+                subtask2.getEpicIdTask()), subtask2.getIdTask() );
 
         assertEquals(Task.Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE, когда все его подзадачи завершены.");
     }
@@ -187,8 +231,19 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.NEW, subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+                "new title Subtask1",
+                "new description Subtask1",
+                Task.Status.NEW,
+                Duration.ofHours(45),
+                LocalDateTime.of(2026, 2, 6, 13, 53),
+                subtask1.getEpicIdTask()),
+                subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2",
+                Task.Status.DONE,
+                Duration.ofDays(26),
+                LocalDateTime.of(2026, 1, 19,19, 19),
+                subtask2.getEpicIdTask()), subtask2.getIdTask());
 
         assertEquals(Task.Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS, когда его подзадачи в разных статусах.");
     }
@@ -199,9 +254,19 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "new title Subtask1",  "new description Subtask1", Task.Status.IN_PROGRESS, subtask1.getEpicIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2", Task.Status.DONE, subtask2.getEpicIdTask()), subtask2.getIdTask());
-
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+                        "new title Subtask1",
+                        "new description Subtask1",
+                        Task.Status.NEW,
+                        Duration.ofHours(45),
+                        LocalDateTime.of(2026, 2, 6, 13, 53),
+                        subtask1.getEpicIdTask()),
+                subtask1.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",  "new description Subtask2",
+                Task.Status.DONE,
+                Duration.ofDays(26),
+                LocalDateTime.of(2026, 1, 19,19, 19),
+                subtask2.getEpicIdTask()), subtask2.getIdTask());
         assertEquals(Task.Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS, когда его подзадачи в разных статусах.");
     }
 
@@ -243,7 +308,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         List<Subtask> subtasksOfEpic = taskManager.getSubtasksOfEpic(epic.getIdTask());
         assertEquals(2, subtasksOfEpic.size(), "Должно быть 2 сабтаска для данного эпика");
 
-        Epic anotherEpic = new Epic("Another Epic", "Another Epic description");
+        Epic anotherEpic = new Epic("Another Epic", Task.Status.IN_PROGRESS, "Another Epic description" );
         taskManager.createEpic(anotherEpic);
         subtasksOfEpic = taskManager.getSubtasksOfEpic(anotherEpic.getIdTask());
         assertEquals(0, subtasksOfEpic.size(), "Список сабтасков для другого эпика должен быть пуст");
@@ -263,21 +328,33 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task2);
 
         Subtask updatetedSubtask = new Subtask("update Subtask1", "update description subtask1",
-                Task.Status.IN_PROGRESS, epic.getIdTask());
+                Task.Status.IN_PROGRESS, Duration.of(12, HOURS), LocalDateTime.now(), epic.getIdTask());
+
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "new title Subtask2",
+                "new description Subtask2",
+                Task.Status.DONE,
+                Duration.ofDays(26),
+                LocalDateTime.of(2026, 1, 19,19, 19),
+                subtask2.getEpicIdTask()), subtask2.getIdTask());
+
+
+
         taskManager.updateSubtask(updatetedSubtask, subtask1.getIdTask());
 
         assertEquals(updatetedSubtask, taskManager.getSubtaskById(subtask1.getIdTask()));
 
         Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2",
-                Task.Status.DONE, epic.getIdTask());
+                Task.Status.DONE, Duration.of(453, HOURS),
+                LocalDateTime.now(), epic.getIdTask());
         taskManager.updateSubtask(updatedSubtask2,subtask1.getIdTask());
         assertEquals(updatedSubtask2, taskManager.getSubtaskById(subtask1.getIdTask()));
 
-        Epic updatedEpic = new Epic("updated Epic", "updated description epic");
+        Epic updatedEpic = new Epic("updated Epic", Task.Status.DONE, "updated description epic");
         taskManager.updateEpic(updatedEpic, epic.getIdTask());
         assertEquals(updatedEpic, taskManager.getEpicById(epic.getIdTask()));
 
-        Task updatedTask1 = new Task("updated Task1", "updated description task1");
+        Task updatedTask1 = new Task("upd Task1 title", "upd Task1 description", Task.Status.DONE,
+                Duration.ofDays(45), LocalDateTime.of(2026,4,2,2,35));
         taskManager.updateTask(updatedTask1, task1.getIdTask());
         assertEquals(updatedTask1, taskManager.getTaskById(task1.getIdTask()));
 
@@ -326,10 +403,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         // 5. epic (время начала = времени первой подзадачи = 2025-12-25 12:35)
 
         assertEquals(task2, prioritizedTasks.get(0), "Первая задача должна быть task2");
-        assertEquals(subtask1, prioritizedTasks.get(1), "Вторая задача должна быть subtask1");
-        assertEquals(task1, prioritizedTasks.get(2), "Третья задача должна быть task1");
-        assertEquals(subtask2, prioritizedTasks.get(3), "Четвертая задача должна быть subtask2");
-        assertEquals(epic, prioritizedTasks.get(4), "Пятая задача должна быть epic");
+        assertEquals(epic, prioritizedTasks.get(1), "Вторая задача должна быть subtask1");
+        assertEquals(subtask1, prioritizedTasks.get(2), "Третья задача должна быть task1");
+        assertEquals(task1, prioritizedTasks.get(3), "Четвертая задача должна быть subtask2");
+        assertEquals(subtask2, prioritizedTasks.get(4), "Пятая задача должна быть epic");
     }
 
 }

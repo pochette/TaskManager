@@ -1,47 +1,25 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class Subtask extends Task {
     private final int epicIdTask;
 
-    public Subtask(int idTask, String title, String description, Status status, int epicIdTask) {
-        super(idTask, title, description, status, TypesOfTask.SUBTASK);
+    // конструктор для восстановления из файла c id
+    public Subtask(int idTask, String title, String description, Status status,
+                   Duration duration, LocalDateTime startTime,
+                   int epicIdTask) {
+        super(idTask, title, description, status, duration, startTime);
         this.epicIdTask = epicIdTask;
     }
 
-    public Subtask(String title, String description, Status status, int epicIdTask) {
-        super(title, description, status, TypesOfTask.SUBTASK);
-        this.epicIdTask = epicIdTask;
-    }
-
-    // конструктор для восстановления из файла
-    public Subtask(int idTask, String title, String description, Status status, Duration duration, LocalDateTime startTime,
-                   TypesOfTask typesOfTask, int epicIdTask) {
-        super(idTask, title, description, status, duration, startTime, typesOfTask);
-        this.epicIdTask = epicIdTask;
-    }
-
-    public Subtask(String title, String description, TypesOfTask typesOfTask, Status status, Duration duration,
+    // конструктор для создания нового подзадачи без id
+    public Subtask(String title, String description,
+                   Status status, Duration duration,
                    LocalDateTime startTime, int epicIdTask) {
-        super(title, description, typesOfTask, status, duration, startTime);
+        super(title, description, status, duration, startTime);
         this.epicIdTask = epicIdTask;
     }
 
-    public Subtask(String title, String description, Status status, TypesOfTask typesOfTask, int epicIdTask) {
-        super(title, description, status, typesOfTask);
-        this.epicIdTask = epicIdTask;
-    }
-
-    public Subtask(String title, String description, int epicIdTask) {
-        super(title, description);
-        this.epicIdTask = epicIdTask;
-    }
-
-    public Subtask(int idTask, String title, String description, Status status, TypesOfTask typesOfTask, int epicIdTask) {
-        super(idTask, title, description, status, typesOfTask);
-        this.epicIdTask = epicIdTask;
-    }
 
 
     public int getEpicIdTask() {

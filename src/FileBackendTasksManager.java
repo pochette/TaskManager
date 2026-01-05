@@ -236,11 +236,11 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
         }
 
         return switch (typesOfTask) {
-            case TASK -> new Task(id, title, description, status, duration, startTime, TypesOfTask.TASK);
-            case EPIC -> new Epic(id, title,  description, status, duration, startTime, typesOfTask);
+            case TASK -> new Task(id, title, description, status, duration, startTime);
+            case EPIC -> new Epic(id, title,  description, status, duration, startTime);
             case SUBTASK -> {
                 int epicId = Integer.parseInt(valuesOfFields[7]);
-                yield new Subtask(id, title, description, status, duration, startTime, typesOfTask,  epicId);
+                yield new Subtask(id, title, description, status, duration, startTime,  epicId);
             }
         };
     }

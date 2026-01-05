@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,10 +21,12 @@ class EpicTest {
     @BeforeEach
     void setUp() {
         taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
-        epic = new Epic("Epic 1", "Description 1");
+        epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
         taskManager.createTask(epic);
-        subtask1 = new Subtask("Subtask 1", "Description 1", Task.Status.NEW, epic.getIdTask());
-        subtask2 = new Subtask("Subtask 2", "Description 2", Task.Status.NEW,  epic.getIdTask());
+        subtask1 = new Subtask("Subtask 1", "Description 1", Task.Status.NEW, Duration.ofDays(43),
+                LocalDateTime.of(2026,1,4,4,56), epic.getIdTask());
+        subtask2 = new Subtask("Subtask 2 title", "Description Subtask2", Task.Status.NEW, Duration.ofHours(56),
+                LocalDateTime.of(2026,1,5,6,34), epic.getIdTask());
     }
     @AfterEach
     void tearDown() {
@@ -44,8 +48,11 @@ class EpicTest {
         taskManager.createSubtask(subtask2);
 
         //When
-        taskManager.updateSubtask(new Subtask("updated Subtask1", "updated description Subtask1",statusSubtask1,  epic.getIdTask()), subtask1.getIdTask());
-        taskManager.updateSubtask(new Subtask("updated Subtask2", "updated description Subtask2", statusSubtask2, epic.getIdTask()), subtask2.getIdTask());
+        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "updated Subtask1", "updated description Subtask1", statusSubtask1, Duration.ofHours(56), LocalDateTime.of(2026,1,6,13,56), epic.getIdTask()), subtask1.getIdTask());
+
+
+        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "updated Subtask2", "updated description Subtask2", statusSubtask2, Duration.ofHours(5), LocalDateTime.of(2026,2,3,14,57), epic.getIdTask()), subtask2.getIdTask());
+
         Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
 
         //Then

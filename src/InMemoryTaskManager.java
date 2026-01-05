@@ -2,29 +2,28 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
+    private static final LocalDateTime NO_TIME = LocalDateTime.of(1, 1, 1, 1, 1);
     private final Map<Integer, Task> taskMap = new HashMap<>();// хранение Task
     private final Map<Integer, Epic> epicMap = new HashMap<>();// хранение Epic
-    private final Map<Integer, Subtask> subtaskMap = new HashMap<>();// хран
-
+    private final Map<Integer, Subtask> subtaskMap = new HashMap<>();// хранение Subtask
     private final HistoryManager historyManager;
-
     private final Set<Task> prioritizedTask = new TreeSet<>(
-            Comparator.comparing(Task::getStartTime,
-                            Comparator.nullsLast(LocalDateTime::compareTo))
-                    .thenComparing(Task::getIdTask)  // Добавляем вторичную сортировку по ID
-    );
+            Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)).
+                    thenComparing(Task::getIdTask));
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
     }
 
+    protected void addTaskByPriority(Task task) {
+        if (task.getStartTime() != null && !task.getStartTime().equals(NO_TIME)) {
+            prioritizedTask.add(task);
+        }
+    }
+
     @Override
     public void createEpic(Epic epic) {
         epicMap.put(epic.getIdTask(), epic);
-        if(epic.getStartTime() != null) {
-            prioritizedTask.add(epic);
-        }
-        prioritizedTask.add(epic);
     }
 
     @Override
@@ -37,13 +36,15 @@ public class InMemoryTaskManager implements TaskManager {
         epic.addSubtask(subtask);
         recalcEpicStatus(epic);
         subtaskMap.put(subtask.getIdTask(), subtask);
-        prioritizedTask.add(subtask);
+        addTaskByPriority(subtask);
+        prioritizedTask.remove(epic);
+        addTaskByPriority(epic);
     }
 
     @Override
     public void createTask(Task task) {
         taskMap.put(task.getIdTask(), task);
-        prioritizedTask.add(task);
+        addTaskByPriority(task);
     }
 
     @Override
@@ -163,6 +164,7 @@ public class InMemoryTaskManager implements TaskManager {
                 prioritizedTask.remove(subtask);
                 subtaskMap.remove(subtask.getIdTask());
             }
+            prioritizedTask.remove(epic);
             historyManager.remove(i);
         }
         epicMap.clear();
@@ -173,9 +175,11 @@ public class InMemoryTaskManager implements TaskManager {
 
         List<Task> historyList = historyManager.getHistory();
         for (Task task : historyList) {
-            if (task instanceof Subtask) {
-                historyManager.remove(task.getIdTask());
-                prioritizedTask.remove(task);
+            if (task instanceof Subtask subtask) {
+                historyManager.remove(subtask.getIdTask());
+                prioritizedTask.remove(subtask);
+                prioritizedTask.remove(epicMap.get(subtask.getEpicIdTask()));
+                addTaskByPriority(epicMap.get(subtask.getEpicIdTask()));
             }
         }
         subtaskMap.clear();
@@ -231,6 +235,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             epic.deleteSubtaskFromSubtasksSet(subtaskToRemove);
             recalcEpicStatus(epic);
+            epic.calculateEndTime();
+            prioritizedTask.remove(epic);
+            addTaskByPriority(epic);
         }
         prioritizedTask.remove(subtaskToRemove);
         historyManager.remove(id);
@@ -264,9 +271,7 @@ public class InMemoryTaskManager implements TaskManager {
         // статус пересчитывается только по сабтаскам
         recalcEpicStatus(newEpic);
         epicMap.replace(oldId, newEpic);
-}
-
-
+    }
 
     @Override
     public void updateSubtask(Subtask newSubtask, int oldId) {
@@ -276,11 +281,13 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtaskMap.replace(oldId, newSubtask);
         prioritizedTask.remove(subtaskMap.get(oldId));
-        prioritizedTask.add(newSubtask);
+        addTaskByPriority(newSubtask);
         Epic epic = epicMap.get(newSubtask.getEpicIdTask());
         if (epic != null) {
             recalcEpicStatus(epic);
             epic.calculateEndTime();
+            prioritizedTask.remove(epic);
+            addTaskByPriority(epic);
         }
     }
 
@@ -288,6 +295,6 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task newTask, int oldId) {
         taskMap.replace(oldId, newTask);
         prioritizedTask.remove(taskMap.get(oldId));
-        prioritizedTask.add(newTask);
+        addTaskByPriority(newTask);
     }
 }
