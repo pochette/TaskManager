@@ -1,12 +1,12 @@
 id,type,name,status,description,duration,startTime,epic
-0,TASK,Task1 title,NEW,Task1 Description,PT360H,2026-01-01T10:00
-561,TASK,Task 561 title,NEW,Task 561 Description,PT240H,2025-12-25T10:00
-1,TASK,Task2 title,NEW,Task2 Description,PT240H,2025-12-25T10:00
-210,TASK,Task 210 title,NEW,Task 210 Description,PT360H,2026-01-01T10:00
-2,EPIC,Epic title,NEW,Epic description,PT528H,2025-12-25T10:00
-9782,EPIC,Epic 9782 title,NEW,Epic 9782 description,PT360H,2026-01-01T10:00
-3,SUBTASK,Subtask1 title,NEW,Subtask1 description,PT240H,2025-12-25T10:00,2
-4,SUBTASK,Subtask2 title,NEW,Subtask2 description,PT360H,2026-01-01T10:00,9782
-983,SUBTASK,Subtask 983 title,NEW,Subtask 983 description,PT360H,2026-01-01T10:00,2
+0,TASK,Task1 title,NEW,Task1 Description,PT72H,2026-01-01T10:00
+561,TASK,Task 561 title,NEW,Task 561 Description,PT72H,2026-01-04T10:00
+1,TASK,Task2 title,NEW,Task2 Description,PT72H,2026-01-07T10:00
+210,TASK,Task 210 title,NEW,Task 210 Description,PT72H,2026-01-10T10:00
+2,EPIC,Epic title,NEW,Epic description,PT216H,2026-01-19T10:00
+9782,EPIC,Epic 9782 title,NEW,Epic 9782 description,PT72H,2026-01-22T10:00
+3,SUBTASK,Subtask1 title,NEW,Subtask1 description,PT72H,2026-01-19T10:00,2
+4,SUBTASK,Subtask2 title,NEW,Subtask2 description,PT72H,2026-01-22T10:00,9782
+983,SUBTASK,Subtask 983 title,NEW,Subtask 983 description,PT72H,2026-01-25T10:00,2
 
 561,9782,983

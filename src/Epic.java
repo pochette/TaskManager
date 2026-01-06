@@ -106,6 +106,10 @@ public class Epic extends Task {
         this.duration = duration;
 
     }
+    @Override
+    public String toString(Task task) {
+        return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription();
+    }
 
 //    @Override
 //    public String toString() {

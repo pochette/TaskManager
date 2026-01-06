@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -8,47 +9,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HistoryManagerTest {
     private final TaskManager taskManager = Manager.getDefault();
-    private Task task1 = new Task("Task1 title", "Task1 Description", Task.Status.NEW,
-            Duration.ofDays(15), LocalDateTime.of(2026, 1, 1, 10, 0));
-    private Task task2 = new Task("Task2 title", "Task2 Description", Task.Status.NEW,
-            Duration.ofDays(10), LocalDateTime.of(2025, 12, 25, 10, 0));
+    private Task task1;
+    private Task task2;
+    private Epic epic;
 
-    private Epic epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
+    private Subtask subtask1;
+    private Subtask subtask2;
 
-    private Subtask subtask1 = new Subtask(
-            "Subtask1 title",
-            "Subtask1 description",
-
-            Task.Status.NEW,
-            Duration.ofDays(30),
-            LocalDateTime.of(2025, 12, 25, 12, 35), epic.getIdTask());
-    private Subtask subtask2 = new Subtask(
-            "Subtask2 title",
-            "Subtask2 description",
-            Task.Status.NEW,
-            Duration.ofDays(20),
-            LocalDateTime.of(2026, 1, 15, 14, 0), epic.getIdTask());
-
+    @BeforeEach
     void setUp() {
         task1 = new Task("Task1 title", "Task1 Description", Task.Status.NEW,
-                Duration.ofDays(15), LocalDateTime.of(2026, 1, 1, 10, 0));
+                Duration.ofDays(15), LocalDateTime.of(2020, 1, 1, 10, 0));
         task2 = new Task("Task2 title", "Task2 Description", Task.Status.NEW,
-                Duration.ofDays(10), LocalDateTime.of(2025, 12, 25, 10, 0));
+                Duration.ofDays(10), LocalDateTime.of(2021, 12, 25, 10, 0));
 
         epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
 
         subtask1 = new Subtask(
                 "Subtask1 title",
                 "Subtask1 description",
+
                 Task.Status.NEW,
                 Duration.ofDays(30),
-                LocalDateTime.of(2025, 12, 25, 12, 35), epic.getIdTask());
+                LocalDateTime.of(2030, 12, 25, 12, 35), epic.getIdTask());
         subtask2 = new Subtask(
                 "Subtask2 title",
                 "Subtask2 description",
                 Task.Status.NEW,
                 Duration.ofDays(20),
-                LocalDateTime.of(2026, 1, 15, 14, 0), epic.getIdTask());
+                LocalDateTime.of(2024, 1, 15, 14, 0), epic.getIdTask());
     }
 
     @AfterEach

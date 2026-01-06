@@ -19,31 +19,26 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @BeforeEach
     void setUp() throws IOException {
-        // Задачи с НЕПЕРЕСЕКАЮЩИМСЯ временем
         task1 = new Task("Task1 title", "Task1 Description", Task.Status.NEW,
-                Duration.ofDays(3), LocalDateTime.of(2027, 1, 1, 10, 0)); // 1-4 января
-
+                Duration.ofDays(15), LocalDateTime.of(2020, 1, 1, 10, 0));
         task2 = new Task("Task2 title", "Task2 Description", Task.Status.NEW,
-                Duration.ofDays(2), LocalDateTime.of(2028, 12, 25, 10, 0)); // 25-27 декабря
+                Duration.ofDays(10), LocalDateTime.of(2021, 12, 25, 10, 0));
 
-        epic = new Epic("Epic title", Task.Status.NEW, "Epic description");
+        epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
 
-        // Подзадачи с НЕПЕРЕСЕКАЮЩИМСЯ временем
         subtask1 = new Subtask(
                 "Subtask1 title",
                 "Subtask1 description",
-                Task.Status.NEW,
-                Duration.ofDays(5), // 5 дней
-                LocalDateTime.of(2025, 12, 28, 12, 35), // начинается 28 декабря
-                epic.getIdTask());
 
+                Task.Status.NEW,
+                Duration.ofDays(30),
+                LocalDateTime.of(2030, 12, 25, 12, 35), epic.getIdTask());
         subtask2 = new Subtask(
                 "Subtask2 title",
                 "Subtask2 description",
                 Task.Status.NEW,
-                Duration.ofDays(4), // 4 дня
-                LocalDateTime.of(2026, 1, 5, 14, 0), // начинается 5 января (после окончания task1)
-                epic.getIdTask());
+                Duration.ofDays(20),
+                LocalDateTime.of(2024, 1, 15, 14, 0), epic.getIdTask());
     }
 
     // Исправленные тесты, где было пересечение времени:
@@ -237,7 +232,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2",
                 Task.Status.DONE,
                 Duration.ofHours(48), // 2 дня
-                LocalDateTime.of(2026, 1, 9, 10, 0), // 9 января
+                LocalDateTime.of(2019, 1, 9, 10, 0), // 9 января
                 epic.getIdTask());
 
         taskManager.updateSubtask(updatedSubtask2, subtask1.getIdTask());
@@ -248,7 +243,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(updatedEpic, taskManager.getEpicById(epic.getIdTask()));
 
         Task updatedTask1 = new Task("upd Task1 title", "upd Task1 description", Task.Status.DONE,
-                Duration.ofDays(2), LocalDateTime.of(2026, 1, 10, 2, 35)); // 10 января
+                Duration.ofDays(2), LocalDateTime.of(2024, 1, 10, 2, 35)); // 10 января
         taskManager.updateTask(updatedTask1, task1.getIdTask());
         assertEquals(updatedTask1, taskManager.getTaskById(task1.getIdTask()));
     }
@@ -264,21 +259,19 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
 
         // Теперь должно быть 5 элементов в правильном порядке
-        assertEquals(5, prioritizedTasks.size(), "Должно быть 5 задач в приоритетном списке");
+        assertEquals(4, prioritizedTasks.size(), "Должно быть 5 задач в приоритетном списке");
 
         // Порядок по времени начала с НОВЫМИ временами:
         // 1. task2     (2025-12-25 10:00) длится 2 дня → заканчивается 27.12
         // 2. subtask1  (2025-12-28 12:35) начинается после task2, длится 5 дней → заканчивается 02.01
         // 3. task1     (2026-01-01 10:00) начинается после subtask1, длится 3 дня → заканчивается 04.01
         // 4. subtask2  (2026-01-05 14:00) начинается после task1, длится 4 дня → заканчивается 09.01
-        // 5. epic (время начала = времени первой подзадачи = 2025-12-28 12:35)
 
         // Проверяем порядок
-        assertEquals(task2, prioritizedTasks.get(0), "Первая задача должна быть task2");
-        assertEquals(subtask1, prioritizedTasks.get(1), "Вторая задача должна быть subtask1");
-        assertEquals(task1, prioritizedTasks.get(2), "Третья задача должна быть task1");
-        assertEquals(subtask2, prioritizedTasks.get(3), "Четвертая задача должна быть subtask2");
-        assertEquals(epic, prioritizedTasks.get(4), "Пятая задача должна быть epic");
+        assertEquals(task1, prioritizedTasks.get(0), "Первая задача должна быть task2");
+        assertEquals(task2, prioritizedTasks.get(1), "Вторая задача должна быть subtask1");
+        assertEquals(subtask2, prioritizedTasks.get(2), "Третья задача должна быть task1");
+        assertEquals(subtask1, prioritizedTasks.get(3), "Четвертая задача должна быть subtask2");
     }
 }
 

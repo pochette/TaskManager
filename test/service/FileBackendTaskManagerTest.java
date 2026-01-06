@@ -2,14 +2,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Proxy;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -213,13 +209,13 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
 
         taskManager2.loadFromFile(TEST_FILE_PATH);
 
-        assertEquals("561,TASK,Task 561 title,NEW,Task 561 Description,PT240H,2025-12-25T10:00",
+        assertEquals("561,TASK,Task 561 title,NEW,Task 561 Description,PT72H,2026-01-04T10:00",
                 taskManager2.getTaskById(561).toString(taskManager2.getTaskById(561)));
 
-        assertEquals("9782,EPIC,Epic 9782 title,NEW,Epic 9782 description,PT360H,2026-01-01T10:00",
+        assertEquals("9782,EPIC,Epic 9782 title,NEW,Epic 9782 description",
                 taskManager2.getEpicById(9782).toString(taskManager2.getEpicById(9782)));
 
-        assertEquals("983,SUBTASK,Subtask 983 title,NEW,Subtask 983 description,PT360H,2026-01-01T10:00,2",
+        assertEquals("983,SUBTASK,Subtask 983 title,NEW,Subtask 983 description,PT72H,2026-01-25T10:00,2",
                 taskManager2.getSubtaskById(983).toString(taskManager2.getSubtaskById(983)));
 
     }
