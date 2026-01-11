@@ -11,7 +11,11 @@ public class NewFileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void createEpic(Epic epic) {
         super.createEpic(epic);
-        taskStorageManager.save(this.getListOfAllTasks());
+        try {
+            taskStorageManager.save(this.getListOfAllTasks());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

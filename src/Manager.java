@@ -1,5 +1,10 @@
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +15,7 @@ public final class Manager {
     private static final HistoryManager historyManager = new InMemoryHistoryManager();
     private static final TaskManager taskManager = new InMemoryTaskManager(historyManager);
     private static final Path tasksStorageFile = Paths.get("src/Backend/Backend.csv");
-    static TaskCSVTransformer taskCSVTransformer = new TaskCSVTransformer();
+    private static final TaskCSVTransformer taskCSVTransformer = new TaskCSVTransformer();
     private static final TaskStorageManager defaultTaskStorageManager = defaultTaskStorageManager();
 
     private Manager() {
@@ -18,8 +23,9 @@ public final class Manager {
 
     public static TaskStorageManager defaultTaskStorageManager() {
         Function<Task, String> csvSerializer = taskCSVTransformer::taskToCSV;
+        Function<String, Task> csvDeserializer = taskCSVTransformer::taskFromLoad;
 
-        return new FileBasedTaskStorageManager(tasksStorageFile, null, null);
+        return new FileBasedTaskStorageManager(tasksStorageFile, csvSerializer, csvDeserializer);
     }
 
     public static TaskManager getDefault() {
@@ -48,11 +54,13 @@ public final class Manager {
         final Map<Integer, Subtask> subtaskMap = new HashMap<>();
         final Map<Integer, Epic> epicMap = new HashMap<>();
 
+
         taskList.stream()
                 .filter(task -> String.valueOf(task.getIdTask()).startsWith("2"))
                 .map(Task::getTitle)
                 .sorted(Comparator.naturalOrder())
                 .toList();
+
 
         for (Task task : taskList) {
             switch (task.getType()) {
@@ -89,7 +97,7 @@ public final class Manager {
         }
     }
 
-    static class TaskCSVTransformer {
+    public static class TaskCSVTransformer {
         public String taskToCSV(Task task) {
             if (!(task instanceof Subtask)) {
                 return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription() +
@@ -99,6 +107,36 @@ public final class Manager {
                         "," + task.getDuration() + "," + task.getStartTime() + "," + ((Subtask) task).getEpicIdTask();
             }
         }
+        public Task taskFromLoad(String value) {
+            String[] valuesOfFields = value.split(",");
+            int id = Integer.parseInt(valuesOfFields[0]);
+            TypesOfTask typesOfTask = TypesOfTask.valueOf(valuesOfFields[1]);
+            String title = valuesOfFields[2];
+            Task.Status status = Task.Status.valueOf(valuesOfFields[3]);
+            String description = valuesOfFields[4];
+
+            Duration duration = null;
+            if (valuesOfFields.length > 6 && !valuesOfFields[5].equals("null")) {
+                duration = Duration.parse(valuesOfFields[5]);
+            }
+
+            LocalDateTime startTime = null;
+            if (valuesOfFields.length > 6 && !valuesOfFields[6].equals("null")) {
+                startTime = LocalDateTime.parse(valuesOfFields[6]);
+            }
+
+            return switch (typesOfTask) {
+                case TASK -> new Task(id, title, description, status, duration, startTime);
+                case EPIC -> new Epic(id, title,  description, status, duration, startTime);
+                case SUBTASK -> {
+                    int epicId = Integer.parseInt(valuesOfFields[7]);
+                    yield new Subtask(id, title, description, status, duration, startTime,  epicId);
+                }
+            };
+        }
+
+
     }
+
 
 }

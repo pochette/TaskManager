@@ -29,7 +29,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubtask(Subtask subtask) {
         if (!isNoOverLap(subtask)) {
-            throw new TaskTimeOverLapException(timeOverLapError);
+            throw new TaskTimeOverlapException(timeOverLapError);
         }
         Epic epic = epicMap.get(subtask.getEpicIdTask());
         if (epic == null) {
@@ -45,7 +45,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         if (!isNoOverLap(task)) {
-            throw new TaskTimeOverLapException(timeOverLapError);
+            throw new TaskTimeOverlapException(timeOverLapError);
         }
         taskMap.put(task.getIdTask(), task);
         addTaskByPriority(task);
@@ -313,7 +313,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if(!isNoOverLap(newSubtask)) {
-            throw new TaskTimeOverLapException(timeOverLapError);
+            throw new TaskTimeOverlapException(timeOverLapError);
         }
         subtaskMap.replace(oldId, newSubtask);
         prioritizedTasks.remove(subtaskMap.get(oldId));
@@ -328,7 +328,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task newTask, int oldId) {
         if(!isNoOverLap(newTask)) {
-            throw new TaskTimeOverLapException(timeOverLapError);
+            throw new TaskTimeOverlapException(timeOverLapError);
         }
         taskMap.replace(oldId, newTask);
         prioritizedTasks.remove(taskMap.get(oldId));
