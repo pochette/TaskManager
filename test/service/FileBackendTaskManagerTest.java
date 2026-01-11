@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasksManager> {
+public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private static final Path FILE_PATH = Path.of("src/Backend/Backend.csv");
     private static final Path TEST_FILE_PATH = Path.of("src/Backend/TestBackend.csv");
 
@@ -38,7 +38,7 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
         }
         HistoryManager historyManager = new InMemoryHistoryManager();
 
-        this.taskManager = new FileBackendTasksManager(historyManager, Path.of("src/Backend/Backend.csv"));
+        this.taskManager = new FileBackedTaskManager(historyManager, Path.of("src/Backend/Backend.csv"));
 
         super.setUp();
     }
@@ -199,7 +199,7 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
 
     @Test
     void test6_shouldToLoadFromFile() {
-        FileBackendTasksManager taskManager2 = new FileBackendTasksManager(Manager.getDefaultHistory(), TEST_FILE_PATH);
+        FileBackedTaskManager taskManager2 = new FileBackedTaskManager(Manager.getDefaultHistory(), TEST_FILE_PATH);
 
         taskManager.createTask(task1);
         taskManager.createTask(task2);
@@ -222,13 +222,13 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<FileBackendTasks
 
     @Test
     void test7_shouldThrowManagerSaveException() {
-        assertThrows(FileBackendTasksManager.ManagerSaveException.class, () -> {
-            FileBackendTasksManager failedTaskManager = new FileBackendTasksManager(Manager.getDefaultHistory(), Paths.get("..."));
+        assertThrows(FileBackedTaskManager.ManagerSaveException.class, () -> {
+            FileBackedTaskManager failedTaskManager = new FileBackedTaskManager(Manager.getDefaultHistory(), Paths.get("..."));
             failedTaskManager.createTask(task1);
         });
 
-        assertThrows(FileBackendTasksManager.ManagerSaveException.class, () -> {
-            FileBackendTasksManager failedTaskManager = new FileBackendTasksManager(Manager.getDefaultHistory(), Paths.get("..."));
+        assertThrows(FileBackedTaskManager.ManagerSaveException.class, () -> {
+            FileBackedTaskManager failedTaskManager = new FileBackedTaskManager(Manager.getDefaultHistory(), Paths.get("..."));
             failedTaskManager.loadFromFile(Paths.get("..."));
         });
         //createFileIfNotExist() test

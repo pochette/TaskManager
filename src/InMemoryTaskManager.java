@@ -27,7 +27,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createSubtask(Subtask subtask) throws TaskTimeOverLapException {
+    public void createSubtask(Subtask subtask) {
         if (!isNoOverLap(subtask)) {
             throw new TaskTimeOverLapException(timeOverLapError);
         }

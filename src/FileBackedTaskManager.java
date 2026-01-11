@@ -7,10 +7,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class FileBackendTasksManager extends InMemoryTaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
     private final Path file;
 
-    public FileBackendTasksManager(HistoryManager historyManager, Path path) {
+    public FileBackedTaskManager(HistoryManager historyManager, Path path) {
         super(historyManager);
         this.file = path;
         createFileIfNotExist();
@@ -247,7 +247,7 @@ public class FileBackendTasksManager extends InMemoryTaskManager {
 
 
     //id,type,name,status,description,duration,startTime,endTime,epic
-    private String taskToString2(Task task) {
+    public static String taskToString2(Task task) {
 
         String string = String.format("%d,%s,%s,%s,%s,%s,%s",
                 task.getIdTask(),
