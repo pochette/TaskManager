@@ -6,12 +6,12 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
-public class FileBasedTaskStorageManager implements TaskStorageManager {
+public class NEWFileBasedTaskStorageManager implements TaskStorageManager {
     private final Path path;
     private final Function<Task, String> serializer;
     private final Function<String, Task> deserializer;
 
-    public FileBasedTaskStorageManager(Path path, Function<Task, String> serializer, Function<String, Task> deserializer) {
+    public NEWFileBasedTaskStorageManager(Path path, Function<Task, String> serializer, Function<String, Task> deserializer) {
         this.path = path;
         this.serializer = serializer;
         this.deserializer = deserializer;

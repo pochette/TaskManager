@@ -1,9 +1,9 @@
 import java.io.IOException;
 
-public class NewFileBackedTaskManager extends InMemoryTaskManager {
+public class NEWFileBackedTaskManager extends InMemoryTaskManager {
     private final TaskStorageManager taskStorageManager;
 
-    public NewFileBackedTaskManager(HistoryManager historyManager, TaskStorageManager taskStorageManager) {
+    public NEWFileBackedTaskManager(HistoryManager historyManager, TaskStorageManager taskStorageManager) {
         super(historyManager);
         this.taskStorageManager = taskStorageManager;
     }
