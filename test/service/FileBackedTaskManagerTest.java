@@ -7,12 +7,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackendTaskManagerTest extends TaskManagerTest<OLDFileBackedTaskManager> {
+public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTaskManager> {
     private static final Path FILE_PATH = Path.of("src/Backend/Backend.csv");
     private static final Path TEST_FILE_PATH = Path.of("src/Backend/TestBackend.csv");
+    Function<Task, String> csvSerializer = new Manager.TaskCSVTransformer()::taskToCSV;
+    Function<String, Task> csvDeserializer = new Manager.TaskCSVTransformer()::taskFromLoad;
+    NEWFileBasedTaskStorageManager taskStorageManager1 = new NEWFileBasedTaskStorageManager(FILE_PATH,csvSerializer, csvDeserializer);
+    NEWFileBasedTaskStorageManager taskStorageManager2 = new NEWFileBasedTaskStorageManager(
+            TEST_FILE_PATH,
+            new Manager.TaskCSVTransformer()::taskToCSV,
+            new Manager.TaskCSVTransformer()::taskFromLoad);
+
 
     void clearCSVFile() throws IOException {
         Path filePath = FILE_PATH;
@@ -29,17 +38,7 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<OLDFileBackedTas
     void setUp() throws IOException {
         clearCSVFile();
 
-        Path filePath = FILE_PATH;
-        if (filePath.getParent() != null && !Files.exists(filePath.getParent())) {
-            Files.createDirectories(filePath.getParent());
-        }
-        if (Files.exists(filePath)) {
-            Files.delete(filePath);
-        }
-        HistoryManager historyManager = new InMemoryHistoryManager();
-
-        this.taskManager = new OLDFileBackedTaskManager(historyManager, Path.of("src/Backend/Backend.csv"));
-
+        taskManager = new NEWFileBackedTaskManager(Manager.getDefaultHistory(), taskStorageManager1);
         super.setUp();
     }
 
@@ -71,7 +70,7 @@ public class FileBackendTaskManagerTest extends TaskManagerTest<OLDFileBackedTas
 
         assertEquals(5, lines.size(), "File should contain  lines (header + 1 epic + 1 subtask + 1 line of history + 1 empty line)");
         List<Task> loadedTasks = new ArrayList<>();
-        Subtask loadedSubtask = (Subtask) taskManager.taskFromLoad(lines.get(2));
+        Subtask loadedSubtask = (Subtask) taskManager(lines.get(2));
 
         assertEquals(subtask1, loadedSubtask, "Loaded subtask should match the original subtask");
 
