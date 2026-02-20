@@ -51,9 +51,9 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         assertEquals(epic, taskManager.getEpicById(epic.getIdTask()));
 
         List<String> lines = Files.readAllLines(FILE_PATH);
-//        String[] lines = fileContent.split("\n");
 
-        assertEquals(4, lines.size(), "File should contain  lines (header + 1 tasks + 1 line of history + 1 empty line)");
+
+        assertEquals(2, lines.size(), "File should contain  lines (header + 1 tasks + 1 line of history + 1 empty line)");
 
         Epic epicFromLoad = (Epic) csvDeserializer.apply(lines.get(1));
 

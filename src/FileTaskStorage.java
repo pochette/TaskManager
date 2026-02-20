@@ -22,6 +22,10 @@ public class FileTaskStorage implements TaskStorage {
         List<Task> tasks = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(path)) {
+            if (scanner.hasNextLine()) {
+                scanner.nextLine(); // Пропускаем заголовок
+            }
+
             while (scanner.hasNext()) {
                 final Task task = deserializer.apply((scanner.nextLine()));
                 tasks.add(task);
@@ -36,6 +40,9 @@ public class FileTaskStorage implements TaskStorage {
     @Override
     public void save(Collection<Task> tasks) {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8 )) {
+            writer.write("id,type,name,status,description,duration,startTime,epic");
+            writer.newLine();
+
             for (Task task : tasks) {
                 writer.write(serializer.apply(task));
                 writer.newLine();
