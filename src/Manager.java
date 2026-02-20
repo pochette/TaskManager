@@ -8,21 +8,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public final class Manager {
+public final  class Manager {
     private static final HistoryManager historyManager = new InMemoryHistoryManager();
     private static final Path tasksStorageFile = Paths.get("src/Backend/Backend.csv");
     private static final TaskCSVTransformer taskCSVTransformer = new TaskCSVTransformer();
     private static final TaskManager taskManager = loadTaskManagerFromFile();
-    private static final TaskStorageManager defaultTaskStorageManager = defaultTaskStorageManager();
+    private static final TaskStorage defaultTaskStorageManager = defaultTaskStorageManager();
 
     private Manager() {
     }
 
     // defaultTaskStorageManager() нужен для создания экземпляра TaskStorageManager, который отвечает за сохранение и загрузку данных о задачах в файл. Это позволяет сохранять состояние задач между запусками программы, обеспечивая непрерывность работы с задачами и их историей.
-    public static TaskStorageManager defaultTaskStorageManager() {
+    public static TaskStorage defaultTaskStorageManager() {
         Function<Task, String> csvSerializer = taskCSVTransformer::taskToCSV;
         Function<String, Task> csvDeserializer = taskCSVTransformer::taskFromLoad;
-        return new NEWFileBasedTaskStorageManager(tasksStorageFile, csvSerializer, csvDeserializer);
+        return new FileTaskStorage(tasksStorageFile, csvSerializer, csvDeserializer);
     }
 
     // getDefault() нужен для получения единственного экземпляра TaskManager, который используется в программе. Это позволяет обеспечить единый доступ к TaskManager и его данным, обеспечивая удобство и непрерывность работы с задачами между различными частями программы.
@@ -44,7 +44,7 @@ public final class Manager {
         final List<Task> taskList = defaultTaskStorageManager().loadFromFile();
         splitTaskByType(taskList);
         final HistoryManager historyManager = getHistoryManager(taskList);
-        return new NEWFileBackedTaskManager(historyManager, defaultTaskStorageManager);
+        return new FileBackedTaskManager(historyManager, defaultTaskStorageManager);
     }
 
     //getHistoryManager() нужен для создания экземпляра HistoryManager и добавления в него задач из списка, который был загружен из файла. Это позволяет сохранить историю просмотров задач при загрузке данных из файла, обеспечивая непрерывность работы с задачами и их историей между запусками программы.
@@ -96,16 +96,16 @@ public final class Manager {
         return allTasksMap;
     }
 
-    //taskToCSV()
-    public static String taskToCSV(Task task) {
-        if (!(task instanceof Subtask)) {
-            return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription() +
-                    "," + task.getDuration() + "," + task.getStartTime();
-        } else {
-            return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription() +
-                    "," + task.getDuration() + "," + task.getStartTime() + "," + ((Subtask) task).getEpicIdTask();
-        }
-    }
+//    //taskToCSV()
+//    public static String taskToCSV(Task task) {
+//        if (!(task instanceof Subtask)) {
+//            return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription() +
+//                    "," + task.getDuration() + "," + task.getStartTime();
+//        } else {
+//            return task.getIdTask() + "," + task.getType() + "," + task.getTitle() + "," + task.getStatus() + "," + task.getDescription() +
+//                    "," + task.getDuration() + "," + task.getStartTime() + "," + ((Subtask) task).getEpicIdTask();
+//        }
+//    }
 
     public static class TaskCSVTransformer {
         public String taskToCSV(Task task) {

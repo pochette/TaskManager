@@ -7,10 +7,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class OLDFileBackedTaskManager extends InMemoryTaskManager {
+public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
     private final Path file;
 
-    public OLDFileBackedTaskManager(HistoryManager historyManager, Path path) {
+    public LegacyFileBackedTaskManager(HistoryManager historyManager, Path path) {
         super(historyManager);
         this.file = path;
         createFileIfNotExist();

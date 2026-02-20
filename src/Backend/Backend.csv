@@ -1,7 +1,1 @@
 id,type,name,status,description,duration,startTime,epic
-166,TASK,Task1 title,NEW,Task1 Description,PT360H,2020-01-01T10:00
-167,TASK,Task2 title,NEW,Task2 Description,PT240H,2021-12-25T10:00
-168,EPIC,Epic title,NEW,Epic Description,PT61582H35M,2024-01-15T14:00
-169,SUBTASK,Subtask1 title,NEW,Subtask1 description,PT720H,2030-12-25T12:35,168
-170,SUBTASK,Subtask2 title,NEW,Subtask2 description,PT480H,2024-01-15T14:00,168
-

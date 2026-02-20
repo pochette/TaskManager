@@ -11,34 +11,36 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTaskManager> {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private static final Path FILE_PATH = Path.of("src/Backend/Backend.csv");
     private static final Path TEST_FILE_PATH = Path.of("src/Backend/TestBackend.csv");
-    Function<Task, String> csvSerializer = new Manager.TaskCSVTransformer()::taskToCSV;
-    Function<String, Task> csvDeserializer = new Manager.TaskCSVTransformer()::taskFromLoad;
-    NEWFileBasedTaskStorageManager taskStorageManager1 = new NEWFileBasedTaskStorageManager(FILE_PATH,csvSerializer, csvDeserializer);
-    NEWFileBasedTaskStorageManager taskStorageManager2 = new NEWFileBasedTaskStorageManager(
+    private final Function<Task, String> csvSerializer = new Manager.TaskCSVTransformer()::taskToCSV;
+    private final Function<String, Task> csvDeserializer = new Manager.TaskCSVTransformer()::taskFromLoad;
+    FileTaskStorage fileTaskStorage2 = new FileTaskStorage(
             TEST_FILE_PATH,
             new Manager.TaskCSVTransformer()::taskToCSV,
             new Manager.TaskCSVTransformer()::taskFromLoad);
-
+    FileTaskStorage fileTaskStorage1 = new FileTaskStorage(FILE_PATH, csvSerializer, csvDeserializer);
 
     void clearCSVFile() throws IOException {
-        Path filePath = FILE_PATH;
-        if (Files.exists(filePath)) {
-            Files.delete(filePath);
+        if (Files.exists(FILE_PATH)) {
+            Files.delete(FILE_PATH);
         }
+        Files.createFile(FILE_PATH);
+        Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
+
     }
 
-    void clearHistoryManager() {
-    }
+//    void clearHistoryManager() {
+//
+//    }
 
     @Override
     @BeforeEach
     void setUp() throws IOException {
         clearCSVFile();
 
-        taskManager = new NEWFileBackedTaskManager(Manager.getDefaultHistory(), taskStorageManager1);
+        taskManager = new FileBackedTaskManager(Manager.getDefaultHistory(), fileTaskStorage1);
         super.setUp();
     }
 
@@ -52,10 +54,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTask
 //        String[] lines = fileContent.split("\n");
 
         assertEquals(4, lines.size(), "File should contain  lines (header + 1 tasks + 1 line of history + 1 empty line)");
-        List<Task> loadedTasks = new ArrayList<>();
-        Epic loadedEpic = (Epic) taskManager.taskFromLoad(lines.get(1));
 
-        assertEquals(epic, loadedEpic, "Loaded epic should match the original epic");
+        Epic epicFromLoad = (Epic) csvDeserializer.apply(lines.get(1));
+
+        assertEquals(epic, epicFromLoad, "Loaded epic should match the original epic");
 
     }
 
@@ -70,7 +72,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTask
 
         assertEquals(5, lines.size(), "File should contain  lines (header + 1 epic + 1 subtask + 1 line of history + 1 empty line)");
         List<Task> loadedTasks = new ArrayList<>();
-        Subtask loadedSubtask = (Subtask) taskManager(lines.get(2));
+        Subtask loadedSubtask = (Subtask) csvDeserializer.apply(lines.get(2));
 
         assertEquals(subtask1, loadedSubtask, "Loaded subtask should match the original subtask");
 
@@ -86,7 +88,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTask
 
         assertEquals(4, lines.size(), "File should contain  lines (header + 1 tasks + 1 line of history + 1 empty line)");
         List<Task> loadedTasks = new ArrayList<>();
-        Task loadedTask = taskManager.taskFromLoad(lines.get(1));
+        Task loadedTask = csvDeserializer.apply(lines.get(1));
 
         assertEquals(task1, loadedTask, "Loaded task should match the original task");
     }
@@ -198,7 +200,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTask
 
     @Test
     void test6_shouldToLoadFromFile() {
-        OLDFileBackedTaskManager taskManager2 = new OLDFileBackedTaskManager(Manager.getDefaultHistory(), TEST_FILE_PATH);
+        LegacyFileBackedTaskManager taskManager2 = new LegacyFileBackedTaskManager(Manager.getDefaultHistory(), TEST_FILE_PATH);
 
         taskManager.createTask(task1);
         taskManager.createTask(task2);
@@ -221,13 +223,13 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<NEWFileBackedTask
 
     @Test
     void test7_shouldThrowManagerSaveException() {
-        assertThrows(OLDFileBackedTaskManager.ManagerSaveException.class, () -> {
-            OLDFileBackedTaskManager failedTaskManager = new OLDFileBackedTaskManager(Manager.getDefaultHistory(), Paths.get("..."));
+        assertThrows(LegacyFileBackedTaskManager.ManagerSaveException.class, () -> {
+            LegacyFileBackedTaskManager failedTaskManager = new LegacyFileBackedTaskManager(Manager.getDefaultHistory(), Paths.get("..."));
             failedTaskManager.createTask(task1);
         });
 
-        assertThrows(OLDFileBackedTaskManager.ManagerSaveException.class, () -> {
-            OLDFileBackedTaskManager failedTaskManager = new OLDFileBackedTaskManager(Manager.getDefaultHistory(), Paths.get("..."));
+        assertThrows(LegacyFileBackedTaskManager.ManagerSaveException.class, () -> {
+            LegacyFileBackedTaskManager failedTaskManager = new LegacyFileBackedTaskManager(Manager.getDefaultHistory(), Paths.get("..."));
             failedTaskManager.loadFromFile(Paths.get("..."));
         });
         //createFileIfNotExist() test
