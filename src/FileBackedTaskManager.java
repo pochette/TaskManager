@@ -1,7 +1,5 @@
-import java.util.List;
-
-
 public class FileBackedTaskManager extends InMemoryTaskManager {
+
     private final TaskStorage taskStorageManager;
 
     public FileBackedTaskManager(HistoryManager historyManager, TaskStorage taskStorageManager) {
@@ -47,8 +45,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeAllTasks() {
-        super.removeAllTasks();
+    public void removeAllOrdinaryTasks() {
+        super.removeAllOrdinaryTasks();
         taskStorageManager.save(this.getListOfAllTasks());
     }
 

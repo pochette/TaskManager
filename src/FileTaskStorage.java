@@ -18,7 +18,7 @@ public class FileTaskStorage implements TaskStorage {
     }
 
     @Override
-    public List<Task> loadFromFile() {
+    public List<Task> loadTasksFromFile() {
         List<Task> tasks = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(path)) {

@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private static final Path FILE_PATH = Path.of("src/Backend/Backend.csv");
     private static final Path TEST_FILE_PATH = Path.of("src/Backend/TestBackend.csv");
-    private final Function<Task, String> csvSerializer = new Manager.TaskCSVTransformer()::taskToCSV;
-    private final Function<String, Task> csvDeserializer = new Manager.TaskCSVTransformer()::taskFromLoad;
+    private final Function<Task, String> csvSerializer = new Manager.CSV_TRANSFORMER()::serializeTask;
+    private final Function<String, Task> csvDeserializer = new Manager.CSV_TRANSFORMER()::taskFromLoad;
     FileTaskStorage fileTaskStorage2 = new FileTaskStorage(
             TEST_FILE_PATH,
-            new Manager.TaskCSVTransformer()::taskToCSV,
-            new Manager.TaskCSVTransformer()::taskFromLoad);
+            new Manager.CSV_TRANSFORMER()::serializeTask,
+            new Manager.CSV_TRANSFORMER()::taskFromLoad);
     FileTaskStorage fileTaskStorage1 = new FileTaskStorage(FILE_PATH, csvSerializer, csvDeserializer);
 
     void clearCSVFile() throws IOException {
@@ -187,7 +187,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
                     task2.getIdTask()), linesFromFile.getLast(), "History line should be equals 1");
 
             //Remove allTask
-            taskManager.removeAllTasks();
+            taskManager.removeAllOrdinaryTasks();
             linesFromFile = Files.readAllLines(FILE_PATH);
             assertEquals(2, linesFromFile.size(), "Should left only one line with values");
             assertEquals("id,type,name,status,description,duration,startTime,epic", linesFromFile.getFirst());

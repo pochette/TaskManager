@@ -7,6 +7,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Task> taskMap = new HashMap<>();// хранение Task
     private final Map<Integer, Epic> epicMap = new HashMap<>();// хранение Epic
     private final Map<Integer, Subtask> subtaskMap = new HashMap<>();// хранение Subtask
+    private final Map<Integer, Task> taskMapAllTypes = new HashMap<>(); // хранение всех типов задач в одном Map для удобства загрузки из файла
     private final HistoryManager historyManager;
     private final Set<Task> prioritizedTasks = new TreeSet<>(
             Comparator.comparing(Task::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)));
@@ -21,13 +22,13 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    @Override
-    public void createEpic(Epic epic) {
+
+    protected void createEpic(Epic epic) {
         epicMap.put(epic.getIdTask(), epic);
     }
 
-    @Override
-    public void createSubtask(Subtask subtask) {
+
+    protected void createSubtask(Subtask subtask) {
         if (!isNoOverLap(subtask)) {
             throw new TaskTimeOverlapException(timeOverLapError);
         }
@@ -47,7 +48,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (!isNoOverLap(task)) {
             throw new TaskTimeOverlapException(timeOverLapError);
         }
-        taskMap.put(task.getIdTask(), task);
+        switch (task.getType()) {
+            case TASK -> createTask(task);
+            case EPIC -> createEpic((Epic) task);
+            case SUBTASK -> createSubtask((Subtask) task);
+            default -> throw new IllegalArgumentException("Неверный тип задачи");
+        }
         addTaskByPriority(task);
     }
 
@@ -112,6 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
         return subtasks;
     }
 
+
     @Override
     public Task getTaskById(int id) {
         historyManager.add(taskMap.get(id));
@@ -160,9 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
-    @Override
-    public void recalcEpicStatus(Epic epic) {
+    protected void recalcEpicStatus(Epic epic) {
         if (epic.getSubtaskSet().isEmpty()) {
             epic.setStatus(Task.Status.NEW);
             return;
@@ -208,6 +213,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public void removeAllOrdinaryTasks() {
+        for (Task task : historyManager.getHistory()) {
+            if (!(task instanceof Epic) && !(task instanceof Subtask)) {
+                historyManager.remove(task.getIdTask());
+                prioritizedTasks.remove(task);
+            }
+        }
+        taskMap.clear();
+
+    }
+
+    @Override
     public void removeAllSubtasks() {
 
         List<Task> historyList = historyManager.getHistory();
@@ -221,27 +238,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeAllTasks() {
-        for (Task task : historyManager.getHistory()) {
-            if (!(task instanceof Epic) && !(task instanceof Subtask)) {
-                historyManager.remove(task.getIdTask());
-                prioritizedTasks.remove(task);
-            }
-        }
-        taskMap.clear();
-
-    }
-
-    @Override
     public void removeAllTypesOfTasks() {
-        removeAllTasks();
+        removeAllOrdinaryTasks();
         removeAllSubtasks();
         removeAllEpics();
         prioritizedTasks.clear();
     }
 
-    @Override
-    public void removeEpicById(int id) {
+    protected void removeEpicById(int id) {
         if (epicMap.get(id) != null) {
             Iterator<Subtask> iterator = epicMap.get(id).getSubtaskSet().iterator();
             while (iterator.hasNext()) {
@@ -258,9 +262,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
-    @Override
-    public void removeSubtaskById(int id) {
+    protected void removeSubtaskById(int id) {
         Subtask subtaskToRemove = subtaskMap.get(id);
         if (subtaskToRemove == null) {
             System.out.println("Подзадача с ID " + id + " не найдена. Удаление не выполнено.");
@@ -284,9 +286,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskToRemove == null) {
             System.out.println("Задача с ID " + id + " не найдена. Удаление не выполнено.");
         }
-        prioritizedTasks.remove(taskToRemove);
-        taskMap.remove(id); // Удаляем саму задачу/эпик
-        historyManager.remove(id);
+        switch (taskToRemove.getType()) {
+            case TASK -> {
+                prioritizedTasks.remove(taskToRemove);
+                taskMap.remove(id); // Удаляем саму задачу/эпик
+                historyManager.remove(id);
+            }
+            case EPIC -> removeEpicById(taskToRemove.getIdTask());
+            case SUBTASK -> removeSubtaskById(taskToRemove.getIdTask());
+            default -> throw new IllegalArgumentException("Неверный тип задачи");
+        }
     }
 
     @Override
@@ -312,7 +321,7 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Подзадача с ID " + oldId + " не найдена. Обновление не выполнено.");
             return;
         }
-        if(!isNoOverLap(newSubtask)) {
+        if (!isNoOverLap(newSubtask)) {
             throw new TaskTimeOverlapException(timeOverLapError);
         }
         subtaskMap.replace(oldId, newSubtask);
@@ -327,7 +336,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task newTask, int oldId) {
-        if(!isNoOverLap(newTask)) {
+        if (!isNoOverLap(newTask)) {
             throw new TaskTimeOverlapException(timeOverLapError);
         }
         taskMap.replace(oldId, newTask);

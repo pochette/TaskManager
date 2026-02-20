@@ -156,8 +156,8 @@ public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeAllTasks() {
-        super.removeAllTasks();
+    public void removeAllOrdinaryTasks() {
+        super.removeAllOrdinaryTasks();
         save();
     }
 

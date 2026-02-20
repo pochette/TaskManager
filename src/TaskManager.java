@@ -2,9 +2,9 @@ import java.util.List;
 
 public interface TaskManager {
 
-    void createEpic(Epic epic);
-
-    void createSubtask(Subtask subtask);
+//    void createEpic(Epic epic);
+//
+//    void createSubtask(Subtask subtask);
 
     void createTask(Task task);
 
@@ -28,19 +28,18 @@ public interface TaskManager {
 
     Task getTaskById(int id);
 
-    void recalcEpicStatus(Epic epic);
 
     void removeAllEpics();
 
     void removeAllSubtasks();
 
-    void removeAllTasks();
+    void removeAllOrdinaryTasks();
 
     void removeAllTypesOfTasks();
 
-    void removeEpicById(int id);
+//    void removeEpicById(int id);
 
-    void removeSubtaskById(int id);
+//    void removeSubtaskById(int id);
 
     void removeTaskById(int id);
 
