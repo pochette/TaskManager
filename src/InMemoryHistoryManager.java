@@ -1,91 +1,89 @@
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final Map<Integer, Node> historyMap = new HashMap<>();
-    private Node head;
-    private Node tail;
+  private final Map<Integer, Node> historyMap = new HashMap<>();
+  private Node head;
+  private Node tail;
 
-    public static String toString(HistoryManager historyManager) {
-        return historyManager.toString();
+  public static String toString(HistoryManager historyManager) {
+    return historyManager.toString();
+  }
+
+  @Override
+  public void add(Task task) {
+    if (task == null) return;
+    remove(task.getIdTask());
+    Node node = new Node(task);
+    linkLast(node);
+    historyMap.put(task.getIdTask(), node);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    InMemoryHistoryManager that = (InMemoryHistoryManager) o;
+    return Objects.equals(head, that.head) && Objects.equals(tail, that.tail);
+  }
+
+  @Override
+  public List<Task> getHistory() {
+    List<Task> taskList = new ArrayList<>();
+    Node current = head;
+    while (current != null) {
+      taskList.add(current.task);
+      current = current.next;
     }
+    return taskList;
+  }
 
-    @Override
-    public void add(Task task) {
-        if (task == null) return;
-        remove(task.getIdTask());
-        Node node = new Node(task);
-        linkLast(node);
-        historyMap.put(task.getIdTask(), node);
+  @Override
+  public int hashCode() {
+    return Objects.hash(head, tail);
+  }
+
+  private void linkLast(Node node) {
+    if (tail == null) {
+      tail = head = node;
+    } else {
+      tail.next = node;
+      node.prev = tail;
+      tail = node;
     }
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return Objects.equals(head, that.head) && Objects.equals(tail, that.tail);
+  @Override
+  public void remove(int id) {
+    Node node = historyMap.remove(id);
+    if (node != null) {
+      removeNode(node);
     }
+  }
 
-    @Override
-    public List<Task> getHistory() {
-        List<Task> taskList = new ArrayList<>();
-        Node current = head;
-        while (current != null) {
-            taskList.add(current.task);
-            current = current.next;
-        }
-        return taskList;
+  private void removeNode(Node node) {
+    if (node == null) return;
+
+    Node prev = node.prev;
+    Node next = node.next;
+
+    if (prev != null) prev.next = next;
+    else head = next;
+
+    if (next != null) next.prev = prev;
+    else tail = prev;
+  }
+
+  @Override
+  public String toString() {
+    return "InMemoryHistoryManager{" + "head=" + head + ", tail=" + tail + '}';
+  }
+
+  private static class Node {
+    Task task;
+    Node prev;
+    Node next;
+
+    public Node(Task task) {
+      this.task = task;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(head, tail);
-    }
-
-    private void linkLast(Node node) {
-        if (tail == null) {
-            tail = head = node;
-        } else {
-            tail.next = node;
-            node.prev = tail;
-            tail = node;
-        }
-
-    }
-
-    @Override
-    public void remove(int id) {
-        Node node = historyMap.remove(id);
-        if (node != null) {
-            removeNode(node);
-        }
-
-    }
-
-    private void removeNode(Node node) {
-        if (node == null) return;
-
-        Node prev = node.prev;
-        Node next = node.next;
-
-        if (prev != null) prev.next = next;
-        else head = next;
-
-        if (next != null) next.prev = prev;
-        else tail = prev;
-    }
-
-    @Override
-    public String toString() {
-        return "InMemoryHistoryManager{" + "head=" + head + ", tail=" + tail + '}';
-    }
-
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        public Node(Task task) {
-            this.task = task;
-        }
-    }
+  }
 }
