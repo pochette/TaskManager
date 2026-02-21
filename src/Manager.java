@@ -62,38 +62,46 @@ public final class Manager {
 
     private static Map<Integer, ? extends Task> splitTaskByType(List<Task> taskList) {
         final Map<Integer, Task> allTaskMap = new HashMap<>();
-        final Map<Integer, Task> taskMap = new HashMap<>();
-        final Map<Integer, Subtask> subtaskMap = new HashMap<>();
-        final Map<Integer, Epic> epicMap = new HashMap<>();
-
         for (Task task : taskList) {
-            switch (task.getType()) {
-                case TASK -> {
-                    //historyManager.add(task);
-                    taskMap.put(task.getIdTask(), task);
-                }
-                case EPIC -> {
-                    //historyManager.add(task);
-                    epicMap.put(task.getIdTask(), (Epic) task);
-                }
-                case SUBTASK -> {
-                    //historyManager.add(task);
-                    subtaskMap.put(task.getIdTask(), (Subtask) task);
-                }
-                default -> throw new IllegalArgumentException();
-            }
+            allTaskMap.put(task.getIdTask(), task);
         }
-        Map<Integer, Task> allTasksMap = new HashMap<>();
-        allTasksMap.putAll(taskMap);
-        allTasksMap.putAll(epicMap);
-        allTasksMap.putAll(subtaskMap);
-
-        for (Task task : taskList) {
-            Integer id = task.getIdTask();
-        }
-
-        return allTasksMap;
+        return allTaskMap;
     }
+
+//    private static Map<Integer, ? extends Task> splitTaskByType(List<Task> taskList) {
+//        final Map<Integer, Task> allTaskMap = new HashMap<>();
+//        final Map<Integer, Task> taskMap = new HashMap<>();
+//        final Map<Integer, Subtask> subtaskMap = new HashMap<>();
+//        final Map<Integer, Epic> epicMap = new HashMap<>();
+//
+//        for (Task task : taskList) {
+//            switch (task.getType()) {
+//                case TASK -> {
+//                    //historyManager.add(task);
+//                    taskMap.put(task.getIdTask(), task);
+//                }
+//                case EPIC -> {
+//                    //historyManager.add(task);
+//                    epicMap.put(task.getIdTask(), (Epic) task);
+//                }
+//                case SUBTASK -> {
+//                    //historyManager.add(task);
+//                    subtaskMap.put(task.getIdTask(), (Subtask) task);
+//                }
+//                default -> throw new IllegalArgumentException();
+//            }
+//        }
+//        Map<Integer, Task> allTasksMap = new HashMap<>();
+//        allTasksMap.putAll(taskMap);
+//        allTasksMap.putAll(epicMap);
+//        allTasksMap.putAll(subtaskMap);
+//
+//        for (Task task : taskList) {
+//            Integer id = task.getIdTask();
+//        }
+//
+//        return allTasksMap;
+//    }
 
     public static class CSV_TRANSFORMER {
         public String serializeTask(Task task) {
@@ -107,28 +115,28 @@ public final class Manager {
         }
 
         public Task taskFromLoad(String csvLine) {
-            String[] valuesOfFields = csvLine.split(",");
-            int id = Integer.parseInt(valuesOfFields[0]);
-            TypesOfTask typesOfTask = TypesOfTask.valueOf(valuesOfFields[1]);
-            String title = valuesOfFields[2];
-            Task.Status status = Task.Status.valueOf(valuesOfFields[3]);
-            String description = valuesOfFields[4];
+            String[] fields = csvLine.split(",");
+            int id = Integer.parseInt(fields[0]);
+            TypesOfTask type = TypesOfTask.valueOf(fields[1]);
+            String title = fields[2];
+            Task.Status status = Task.Status.valueOf(fields[3]);
+            String description = fields[4];
 
             Duration duration = null;
-            if (valuesOfFields.length > 6 && !valuesOfFields[5].equals("null")) {
-                duration = Duration.parse(valuesOfFields[5]);
+            if (fields.length > 6 && !fields[5].equals("null")) {
+                duration = Duration.parse(fields[5]);
             }
 
             LocalDateTime startTime = null;
-            if (valuesOfFields.length > 6 && !valuesOfFields[6].equals("null")) {
-                startTime = LocalDateTime.parse(valuesOfFields[6]);
+            if (fields.length > 6 && !fields[6].equals("null")) {
+                startTime = LocalDateTime.parse(fields[6]);
             }
 
-            return switch (typesOfTask) {
+            return switch (type) {
                 case TASK -> new Task(id, title, description, status, duration, startTime);
                 case EPIC -> new Epic(id, title, description, status, duration, startTime);
                 case SUBTASK -> {
-                    int epicId = Integer.parseInt(valuesOfFields[7]);
+                    int epicId = Integer.parseInt(fields[7]);
                     yield new Subtask(id, title, description, status, duration, startTime, epicId);
                 }
             };

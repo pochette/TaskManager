@@ -22,11 +22,10 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
     protected void createEpic(Epic epic) {
         epicMap.put(epic.getIdTask(), epic);
+        taskMapAllTypes.put(epic.getIdTask(), epic);
     }
-
 
     protected void createSubtask(Subtask subtask) {
         if (!isNoOverLap(subtask)) {
@@ -40,6 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.addSubtask(subtask);
         recalcEpicStatus(epic);
         subtaskMap.put(subtask.getIdTask(), subtask);
+        taskMapAllTypes.put(subtask.getIdTask(), subtask);
         addTaskByPriority(subtask);
     }
 
@@ -49,7 +49,14 @@ public class InMemoryTaskManager implements TaskManager {
             throw new TaskTimeOverlapException(timeOverLapError);
         }
         switch (task.getType()) {
-            case TASK -> createTask(task);
+            case TASK -> {
+                if (!isNoOverLap(task)) {
+                    throw new TaskTimeOverlapException(timeOverLapError);
+                }
+                addTaskByPriority(task);
+                taskMap.put(task.getIdTask(), task);
+                taskMapAllTypes.put(task.getIdTask(), task);
+            }
             case EPIC -> createEpic((Epic) task);
             case SUBTASK -> createSubtask((Subtask) task);
             default -> throw new IllegalArgumentException("Неверный тип задачи");
@@ -107,7 +114,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epicMap.containsKey(epicId)) {
             System.out.println("Эпик с ID " + epicId + " не найден. Подзадачи не найдены.");
             return Collections.emptyList();
-
         }
         Epic epic = epicMap.get(epicId);
         List<Subtask> subtasks = new ArrayList<>();
@@ -118,11 +124,10 @@ public class InMemoryTaskManager implements TaskManager {
         return subtasks;
     }
 
-
     @Override
     public Task getTaskById(int id) {
-        historyManager.add(taskMap.get(id));
-        return taskMap.get(id);
+        historyManager.add(taskMapAllTypes.get(id));
+        return taskMapAllTypes.get(id);
     }
 
     @Override

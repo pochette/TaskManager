@@ -17,6 +17,23 @@ public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
         loadFromFile(path);
     }
 
+    //id,type,name,status,description,duration,startTime,endTime,epic
+    public static String taskToString2(Task task) {
+
+        String string = String.format("%d,%s,%s,%s,%s,%s,%s",
+                task.getIdTask(),
+                task.getType(),
+                task.getTitle(),
+                task.getStatus(),
+                task.getDescription(),
+                task.getDuration() != null ? task.getDuration() : "null",
+                task.getStartTime() != null ? task.getStartTime() : "null");
+        if (task instanceof Subtask subtask) {
+            string = String.join(",", string, Integer.toString(subtask.getEpicIdTask()));
+        }
+        return string;
+    }
+
     @Override
     public void createEpic(Epic epic) {
         super.createEpic(epic);
@@ -150,12 +167,6 @@ public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeAllSubtasks() {
-        super.removeAllSubtasks();
-        save();
-    }
-
-    @Override
     public void removeAllOrdinaryTasks() {
         super.removeAllOrdinaryTasks();
         save();
@@ -174,6 +185,12 @@ public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
 //                task.getDescription(),
 //                task.getDuration().toString(),
 //                task.getStartTime().toString(),
+
+    @Override
+    public void removeAllSubtasks() {
+        super.removeAllSubtasks();
+        save();
+    }
 
     @Override
     public void removeAllTypesOfTasks() {
@@ -237,30 +254,12 @@ public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
 
         return switch (typesOfTask) {
             case TASK -> new Task(id, title, description, status, duration, startTime);
-            case EPIC -> new Epic(id, title,  description, status, duration, startTime);
+            case EPIC -> new Epic(id, title, description, status, duration, startTime);
             case SUBTASK -> {
                 int epicId = Integer.parseInt(valuesOfFields[7]);
-                yield new Subtask(id, title, description, status, duration, startTime,  epicId);
+                yield new Subtask(id, title, description, status, duration, startTime, epicId);
             }
         };
-    }
-
-
-    //id,type,name,status,description,duration,startTime,endTime,epic
-    public static String taskToString2(Task task) {
-
-        String string = String.format("%d,%s,%s,%s,%s,%s,%s",
-                task.getIdTask(),
-                task.getType(),
-                task.getTitle(),
-                task.getStatus(),
-                task.getDescription(),
-                task.getDuration() != null ? task.getDuration() : "null",
-                task.getStartTime() != null ? task.getStartTime() : "null");
-        if (task instanceof Subtask subtask) {
-            string = String.join(",", string, Integer.toString(subtask.getEpicIdTask()));
-        }
-        return string;
     }
 
     public String toString(HistoryManager historyManager) {
@@ -299,11 +298,7 @@ public class LegacyFileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    public static class ManagerSaveException extends RuntimeException {
-        public ManagerSaveException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
+
 }
 
 

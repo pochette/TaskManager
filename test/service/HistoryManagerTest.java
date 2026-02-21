@@ -47,33 +47,33 @@ public class HistoryManagerTest {
 
     @Test
     void test1_shouldDeleteHistoryWhenDeleteTaskById() {
-        taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask1);
+        taskManager.createTask(subtask2);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
         taskManager.getTaskById(task1.getIdTask());
-        taskManager.getSubtaskById(subtask1.getIdTask());
-        taskManager.getEpicById(epic.getIdTask());
+        taskManager.getTaskById(subtask1.getIdTask());
+        taskManager.getTaskById(epic.getIdTask());
 
         assertEquals(3, taskManager.getHistory().size(), "В истории должно быть 3 задачи");
 
         taskManager.removeTaskById(task1.getIdTask());
         assertEquals(2, taskManager.getHistory().size(), "В истории должно быть 2 задачи после удаления задачи 1");
 
-        taskManager.removeSubtaskById(subtask1.getIdTask());
+        taskManager.removeTaskById(subtask1.getIdTask());
         assertEquals(1, taskManager.getHistory().size(), "В истории должна быть 1 задача после удаления подзадачи 1");
 
-        taskManager.removeEpicById(epic.getIdTask());
+        taskManager.removeTaskById(epic.getIdTask());
         assertEquals(0, taskManager.getHistory().size(), "История должна быть пустой после удаления эпика");
     }
 
     @Test
     void test2_shouldNotAddDuplicateTasksInHistory() {
-        taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask1);
+        taskManager.createTask(subtask2);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -86,9 +86,9 @@ public class HistoryManagerTest {
 
     @Test
     void test3_shouldRemoveFromCenterOfHistory() {
-        taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask1);
+        taskManager.createTask(subtask2);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -96,7 +96,7 @@ public class HistoryManagerTest {
         taskManager.getSubtaskById(subtask1.getIdTask());
         taskManager.getEpicById(epic.getIdTask());
         assertEquals(3, taskManager.getHistory().size(), "В истории должно быть 3 задачи");
-        taskManager.removeSubtaskById(subtask1.getIdTask());
+        taskManager.removeTaskById(subtask1.getIdTask());
         assertEquals(2, taskManager.getHistory().size(), "В истории должно быть 2 задачи после удаления подзадачи из центра истории");
         assertEquals(task1, taskManager.getHistory().get(0), "Первая задача в истории должна быть task1");
         assertEquals(epic, taskManager.getHistory().get(1), "Вторая задача в истории должна быть epic");
@@ -109,9 +109,9 @@ public class HistoryManagerTest {
 
     @Test
     void test5_shouldRemoveTaskFromBeginningOfHistory() {
-        taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask1);
+        taskManager.createTask(subtask2);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -127,9 +127,9 @@ public class HistoryManagerTest {
 
     @Test
     void test6_shouldRemoveTaskFromEndOfHistory() {
-        taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask1);
+        taskManager.createTask(subtask2);
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -137,7 +137,7 @@ public class HistoryManagerTest {
         taskManager.getSubtaskById(subtask1.getIdTask());
         taskManager.getEpicById(epic.getIdTask());
         assertEquals(3, taskManager.getHistory().size(), "В истории должно быть 3 задачи");
-        taskManager.removeEpicById(epic.getIdTask());
+        taskManager.removeTaskById(epic.getIdTask());
         assertEquals(1, taskManager.getHistory().size(), "В истории должна быть 1 задачи после удаления эпика из конца истории");
         assertEquals(task1, taskManager.getHistory().get(0), "Первая задача в истории должна быть task1");
     }

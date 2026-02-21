@@ -9,4 +9,4 @@ id,type,name,status,description,duration,startTime,epic
 4,SUBTASK,Subtask2 title,NEW,Subtask2 description,PT72H,2026-01-22T10:00,9782
 983,SUBTASK,Subtask 983 title,NEW,Subtask 983 description,PT72H,2026-01-25T10:00,2
 
-561,9782,983
+5,6,7,0,16,46,52,54,59,61,62,69,70,71,72,73,561,9782,983
