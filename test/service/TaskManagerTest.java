@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class TaskManagerTest<T extends TaskManager> {
 
-    protected T taskManager;
+    protected T taskManagerReadAndWrite;
+    protected T taskManagerOnlyRead;
     protected Task task1;
     protected Task task2;
     protected Epic epic;
@@ -44,12 +45,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test6_shouldCalculateEpicStatusCorrectly() {
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask1.getIdTask(),
                         "new title Subtask1",
                         "new description Subtask1",
                         Task.Status.IN_PROGRESS,
@@ -58,17 +59,17 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask1.getEpicIdTask()),
                 subtask1.getIdTask());
 
-        assertEquals(Task.Status.IN_PROGRESS, taskManager.getEpicById(epic.getIdTask()).getStatus());
+        assertEquals(Task.Status.IN_PROGRESS, taskManagerReadAndWrite.getTaskById(epic.getIdTask()).getStatus());
     }
 
     @Test
     void test7_shouldRecalculateEpicStatusToDone() {
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask2);
-        taskManager.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(subtask1);
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask1.getIdTask(),
                         "new title Subtask1",
                         "new description Subtask1",
                         Task.Status.DONE,
@@ -77,7 +78,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask1.getEpicIdTask()),
                 subtask1.getIdTask());
 
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
                         "new title Subtask2",
                         "new description Subtask2",
                         Task.Status.DONE,
@@ -91,12 +92,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test8_recalculateEpicStatusWhenAllSubtaskAreNew() {
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask1.getIdTask(),
                         "new title Subtask1",
                         "new description Subtask1",
                         Task.Status.NEW,
@@ -105,7 +106,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask1.getEpicIdTask()),
                 subtask1.getIdTask());
 
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
                         "new title Subtask2",
                         "new description Subtask2",
                         Task.Status.NEW,
@@ -119,12 +120,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test10_recalculateEpicStatusWhenAllSubtaskAreDone() {
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask1.getIdTask(),
                         "new title Subtask1",
                         "new description Subtask1",
                         Task.Status.DONE,
@@ -133,7 +134,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask1.getEpicIdTask()),
                 subtask1.getIdTask());
 
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
                         "new title Subtask2",
                         "new description Subtask2",
                         Task.Status.DONE,
@@ -147,12 +148,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test11_recalculateEpicStatusWhenSubtaskAreNewAndDone() {
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask1.getIdTask(),
                         "new title Subtask1",
                         "new description Subtask1",
                         Task.Status.NEW,
@@ -161,7 +162,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask1.getEpicIdTask()),
                 subtask1.getIdTask());
 
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
                         "new title Subtask2",
                         "new description Subtask2",
                         Task.Status.DONE,
@@ -175,12 +176,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test12_recalculateEpicStatusWhenSubtaskAreInProgressAndDone() {
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask1.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask1.getIdTask(),
                         "new title Subtask1",
                         "new description Subtask1",
                         Task.Status.NEW,
@@ -189,7 +190,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask1.getEpicIdTask()),
                 subtask1.getIdTask());
 
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
                         "new title Subtask2",
                         "new description Subtask2",
                         Task.Status.DONE,
@@ -203,11 +204,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void test16_shouldUpdateAllVariantsOfTask(){
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(task1);
+        taskManagerReadAndWrite.createTask(task2);
 
         Subtask updatedSubtask = new Subtask("update Subtask1", "update description subtask1",
                 Task.Status.IN_PROGRESS,
@@ -216,7 +217,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 epic.getIdTask());
 
         // Исправляем время, чтобы не пересекалось
-        taskManager.updateSubtask(new Subtask(subtask2.getIdTask(),
+        taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
                         "new title Subtask2",
                         "new description Subtask2",
                         Task.Status.DONE,
@@ -225,8 +226,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                         subtask2.getEpicIdTask()),
                 subtask2.getIdTask());
 
-        taskManager.updateSubtask(updatedSubtask, subtask1.getIdTask());
-        assertEquals(updatedSubtask, taskManager.getSubtaskById(subtask1.getIdTask()));
+        taskManagerReadAndWrite.updateSubtask(updatedSubtask, subtask1.getIdTask());
+        assertEquals(updatedSubtask, taskManagerReadAndWrite.getTaskById(subtask1.getIdTask()));
 
         Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2",
                 Task.Status.DONE,
@@ -234,28 +235,28 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2019, 1, 9, 10, 0), // 9 января
                 epic.getIdTask());
 
-        taskManager.updateSubtask(updatedSubtask2, subtask1.getIdTask());
-        assertEquals(updatedSubtask2, taskManager.getSubtaskById(subtask1.getIdTask()));
+        taskManagerReadAndWrite.updateSubtask(updatedSubtask2, subtask1.getIdTask());
+        assertEquals(updatedSubtask2, taskManagerReadAndWrite.getTaskById(subtask1.getIdTask()));
 
         Epic updatedEpic = new Epic("updated Epic", Task.Status.DONE, "updated description epic");
-        taskManager.updateEpic(updatedEpic, epic.getIdTask());
-        assertEquals(updatedEpic, taskManager.getEpicById(epic.getIdTask()));
+        taskManagerReadAndWrite.updateEpic(updatedEpic, epic.getIdTask());
+        assertEquals(updatedEpic, taskManagerReadAndWrite.getTaskById(epic.getIdTask()));
 
         Task updatedTask1 = new Task("upd Task1 title", "upd Task1 description", Task.Status.DONE,
                 Duration.ofDays(2), LocalDateTime.of(2024, 1, 10, 2, 35)); // 10 января
-        taskManager.updateTask(updatedTask1, task1.getIdTask());
-        assertEquals(updatedTask1, taskManager.getTaskById(task1.getIdTask()));
+        taskManagerReadAndWrite.updateTask(updatedTask1, task1.getIdTask());
+        assertEquals(updatedTask1, taskManagerReadAndWrite.getTaskById(task1.getIdTask()));
     }
 
     @Test
     void test18_shouldReturnPrioritizedTasks() {
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask1);
-        taskManager.createTask(subtask2);
+        taskManagerReadAndWrite.createTask(task1);
+        taskManagerReadAndWrite.createTask(task2);
+        taskManagerReadAndWrite.createTask(epic);
+        taskManagerReadAndWrite.createTask(subtask1);
+        taskManagerReadAndWrite.createTask(subtask2);
 
-        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+        List<Task> prioritizedTasks = taskManagerReadAndWrite.getPrioritizedTasks();
 
         // Теперь должно быть 5 элементов в правильном порядке
         assertEquals(4, prioritizedTasks.size(), "Должно быть 5 задач в приоритетном списке");

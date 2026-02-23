@@ -126,20 +126,4 @@ public class Epic extends Task {
         + task.getDescription();
   }
 
-  //    @Override
-  //    public String toString() {
-  //        return String.format("%d,%s,%s,%s,%s",
-  //                this.getIdTask(),
-  //                this.getType(),
-  //                this.getTitle(),
-  //                this.getStatus(),
-  //                this.getDescription());
-  //    }
-
-  //    @Override
-  //    public String toString() {
-  //        return "Epic{" + "subtaskSet=" + subtaskSet + ", idTask=" + this.getIdTask() + ",
-  // title='" + this.getTitle() + '\'' + ", description='" + this.getDescription() + '\'' + ",
-  // status=" + this.getStatus() + '}';
-  //    }
 }

@@ -8,6 +8,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest <InMemoryTaskManage
     @Override
     void setUp() throws IOException {
         super.setUp();
-        taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
+        taskManagerReadAndWrite = new InMemoryTaskManager(new InMemoryHistoryManager());
     }
 }

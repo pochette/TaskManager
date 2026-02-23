@@ -42,9 +42,9 @@ class EpicTest {
                                              Task.Status statusSubtask2,
                                              Task.Status expectedEpicStatus) {
         //Given
-        taskManager.createEpic(epic);
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask1);
+        taskManager.createTask(subtask2);
 
         //When
         taskManager.updateSubtask(new Subtask(subtask1.getIdTask(), "updated Subtask1", "updated description Subtask1", statusSubtask1, Duration.ofHours(56), LocalDateTime.of(2027,1,6,13,56), epic.getIdTask()), subtask1.getIdTask());
@@ -52,7 +52,7 @@ class EpicTest {
 
         taskManager.updateSubtask(new Subtask(subtask2.getIdTask(), "updated Subtask2", "updated description Subtask2", statusSubtask2, Duration.ofHours(5), LocalDateTime.of(2028,2,3,14,57), epic.getIdTask()), subtask2.getIdTask());
 
-        Task.Status actualEpicStatus = taskManager.getEpicById(epic.getIdTask()).getStatus();
+        Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
 
         //Then
         assertEquals(expectedEpicStatus, actualEpicStatus, "Epic status is not calculated correctly.");

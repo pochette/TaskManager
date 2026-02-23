@@ -5,7 +5,6 @@ public class InMemoryTaskManager implements TaskManager {
   private static final LocalDateTime NO_TIME = LocalDateTime.of(1, 1, 1, 1, 1);
   private static final String timeOverLapError =
       "Новая задача пересекается по времени с уже существующими задачами";
-  // хранение всех типов задач в одном Map для удобства загрузки из файла
   private final Map<Integer, Task> taskMapAllTypes = new HashMap<>();
   private final HistoryManager historyManager;
   private final Set<Task> prioritizedTasks =
@@ -16,25 +15,24 @@ public class InMemoryTaskManager implements TaskManager {
     this.historyManager = historyManager;
   }
 
-  protected void addTaskByPriority(Task task) {
+  private void addTaskByPriority(Task task) {
     if (task.getStartTime() != null && !task.getStartTime().equals(NO_TIME)) {
       prioritizedTasks.add(task);
     }
   }
 
-  protected void createEpic(Epic epic) {
-      taskMapAllTypes.put(epic.getIdTask(), epic);
+  private void createEpic(Epic epic) {
     taskMapAllTypes.put(epic.getIdTask(), epic);
   }
 
-  protected void createSubtask(Subtask subtask) {
+  private void createSubtask(Subtask subtask) {
     if (!isNoOverLap(subtask)) {
       throw new TaskTimeOverlapException(timeOverLapError);
     }
     Epic epic = (Epic) taskMapAllTypes.get(subtask.getEpicIdTask());
     if (epic == null) {
-      System.out.println("Эпик этого сабтаска не найден.");
-      return;
+      throw new TaskManagerRuntimeException(
+          "Эпик с ID " + subtask.getEpicIdTask() + " для подзадачи не найден.");
     }
     epic.addSubtask(subtask);
     recalcEpicStatus(epic);
@@ -49,9 +47,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
     switch (task.getType()) {
       case TASK -> {
-        addTaskByPriority(task);
         taskMapAllTypes.put(task.getIdTask(), task);
-
+        addTaskByPriority(task);
       }
       case EPIC -> createEpic((Epic) task);
       case SUBTASK -> createSubtask((Subtask) task);
@@ -60,17 +57,11 @@ public class InMemoryTaskManager implements TaskManager {
   }
 
   @Override
-  public Epic getEpicById(int id) {
-    historyManager.add(taskMapAllTypes.get(id));
-    return (Epic) taskMapAllTypes.get(id);
-  }
-
-  @Override
   public List<Epic> getEpicList() {
-    return new ArrayList<>(taskMapAllTypes.values().stream()
+    return taskMapAllTypes.values().stream()
         .filter(task -> task.getType() == TypesOfTask.EPIC)
         .map(task -> (Epic) task)
-        .toList());
+        .toList();
   }
 
   @Override
@@ -88,28 +79,25 @@ public class InMemoryTaskManager implements TaskManager {
     return List.copyOf(prioritizedTasks);
   }
 
-  protected Subtask getSubtaskById(int id) {
-    historyManager.add(taskMapAllTypes.get(id));
-    return (Subtask) taskMapAllTypes.get(id);
-  }
-
   @Override
   public List<Subtask> getSubtaskList() {
-    return taskMapAllTypes.values().stream().
-      .
-        toList();
+    return taskMapAllTypes.values().stream()
+        .filter(task -> task.getType() == TypesOfTask.SUBTASK)
+        .map(task -> (Subtask) task)
+        .toList();
   }
 
   @Override
   public List<Subtask> getSubtasksOfEpic(int epicId) {
-    if (!epicMap.containsKey(epicId)) {
-      System.out.println("Эпик с ID " + epicId + " не найден. Подзадачи не найдены.");
-      return Collections.emptyList();
+    Epic epic = (Epic) taskMapAllTypes.get(epicId);
+    if (epic == null || epic.getType() != TypesOfTask.EPIC) {
+      throw new TaskManagerRuntimeException(
+          "Эпик с ID "
+              + epicId
+              + " не найден или имеет неверный тип. Получение подзадач не выполнено.");
     }
-    Epic epic = epicMap.get(epicId);
     List<Subtask> subtasks = new ArrayList<>();
     for (Subtask subtask : epic.getSubtaskSet()) {
-      historyManager.add(subtask);
       subtasks.add(subtask);
     }
     return subtasks;
@@ -117,17 +105,8 @@ public class InMemoryTaskManager implements TaskManager {
 
   @Override
   public Task getTaskById(int id) {
-    switch (taskMapAllTypes.get(id).getType()) {
-      case TASK -> {
-        historyManager.add(taskMap.get(id));
-      }
-      case EPIC -> {
-        historyManager.add(epicMap.get(id));
-      }
-      case SUBTASK -> {
-        historyManager.add(subtaskMap.get(id));
-      }
-      default -> throw new IllegalArgumentException("Неверный тип задачи");
+    if (!taskMapAllTypes.containsKey(id)) {
+      throw new TaskManagerRuntimeException("Задача с ID " + id + " не найдена.");
     }
     historyManager.add(taskMapAllTypes.get(id));
     return taskMapAllTypes.get(id);
@@ -135,36 +114,31 @@ public class InMemoryTaskManager implements TaskManager {
 
   @Override
   public List<Task> getTaskList() {
-    return taskMap.values().stream().toList();
+    return taskMapAllTypes.values().stream().toList();
   }
 
   public Map<Integer, Task> getTaskMap() {
-    return taskMap;
+    return taskMapAllTypes;
   }
 
-  private boolean isNoOverLap(
-      Task task) { // Проверка на пересечение по времени задачи и уже имеющихся приоритезированных
-    // задач
-    LocalDateTime start = task.getStartTime();
-    LocalDateTime end = task.getEndTime();
-    if (start.isEqual(NO_TIME))
-      return true; // Задачи без времени не попадают в проверку и не будут учтены при приоритезации
-    // Для каждой приоритезированной задачи проверяем попадает ли новая задача во временные рамки
-    if (!prioritizedTasks.isEmpty()) {
-      return prioritizedTasks.stream()
-          .allMatch(
-              taskPrior ->
-                  (taskPrior.getStartTime().isEqual(start) && taskPrior.getEndTime().isEqual(end))
-                      || taskPrior.getStartTime().isAfter(end)
-                      || taskPrior.getStartTime().isEqual(end)
-                      || taskPrior.getEndTime().isBefore(start)
-                      || taskPrior.getEndTime().isEqual(start));
-    } else {
-      return true;
+    private boolean isNoOverLap(Task task) {
+        LocalDateTime start = task.getStartTime();
+        LocalDateTime end = task.getEndTime();
+
+        if (start.isEqual(NO_TIME)) {
+            return true; // Нет времени — нет пересечения
+        }
+
+        return prioritizedTasks.isEmpty()
+            || prioritizedTasks.stream()
+            .allMatch(taskPrior ->
+                taskPrior.getEndTime().isBefore(start) ||
+                    taskPrior.getEndTime().isEqual(start) ||
+                    taskPrior.getStartTime().isAfter(end) ||
+                    taskPrior.getStartTime().isEqual(end));
     }
-  }
 
-  protected void recalcEpicStatus(Epic epic) {
+  private void recalcEpicStatus(Epic epic) {
     if (epic.getSubtaskSet().isEmpty()) {
       epic.setStatus(Task.Status.NEW);
       return;
@@ -174,7 +148,7 @@ public class InMemoryTaskManager implements TaskManager {
     boolean allDone = true;
 
     for (Subtask sub : epic.getSubtaskSet()) {
-      Subtask subtask = subtaskMap.get(sub.getIdTask());
+      Subtask subtask = (Subtask) taskMapAllTypes.get(sub.getIdTask());
       if (subtask != null) {
         Task.Status st = subtask.getStatus();
         if (st != Task.Status.NEW) {
@@ -197,40 +171,32 @@ public class InMemoryTaskManager implements TaskManager {
 
   @Override
   public void removeAllEpics() {
-    for (Integer i : epicMap.keySet()) {
-      Epic epic = epicMap.get(i);
-      for (Subtask subtask : epic.getSubtaskSet()) {
-        historyManager.remove(subtask.getIdTask());
-        prioritizedTasks.remove(subtask);
-        subtaskMap.remove(subtask.getIdTask());
-      }
-      historyManager.remove(i);
-    }
-    epicMap.clear();
+    getEpicList().stream().map(Task::getIdTask).forEach(this::removeEpicById);
   }
 
   @Override
   public void removeAllOrdinaryTasks() {
-    for (Task task : historyManager.getHistory()) {
-      if (!(task instanceof Epic) && !(task instanceof Subtask)) {
-        historyManager.remove(task.getIdTask());
-        prioritizedTasks.remove(task);
-      }
-    }
-    taskMap.clear();
+    List<Integer> taskIds =
+        taskMapAllTypes.values().stream()
+            .filter(task -> task.getType() == TypesOfTask.TASK)
+            .map(Task::getIdTask)
+            .toList();
+
+    taskIds.forEach(
+        id -> {
+          Task taskToRemove = taskMapAllTypes.get(id);
+          removeTaskFromCollections(taskToRemove);
+        });
   }
 
   @Override
   public void removeAllSubtasks() {
-
-    List<Task> historyList = historyManager.getHistory();
-    for (Task task : historyList) {
-      if (task instanceof Subtask subtask) {
-        historyManager.remove(subtask.getIdTask());
-        prioritizedTasks.remove(subtask);
-      }
-    }
-    subtaskMap.clear();
+    List<Integer> subtaskIds =
+        taskMapAllTypes.values().stream()
+            .filter(task -> task.getType() == TypesOfTask.SUBTASK)
+            .map(Task::getIdTask)
+            .toList();
+    subtaskIds.forEach(this::removeSubtaskById);
   }
 
   @Override
@@ -241,52 +207,48 @@ public class InMemoryTaskManager implements TaskManager {
     prioritizedTasks.clear();
   }
 
-  protected void removeEpicById(int id) {
-    if (epicMap.get(id) != null) {
-      Iterator<Subtask> iterator = epicMap.get(id).getSubtaskSet().iterator();
-      while (iterator.hasNext()) {
-        Subtask subtask = iterator.next();
-        if (subtaskMap.get(subtask.getIdTask()) != null) {
-          prioritizedTasks.remove(subtaskMap.get(subtask.getIdTask()));
-          historyManager.remove(subtask.getIdTask());
-          subtaskMap.remove(subtask.getIdTask());
-        }
-      }
-      historyManager.remove(id);
-      epicMap.get(id).deleteAllSubtasks();
-      epicMap.remove(id);
+  private void removeEpicById(int id) {
+    Task epic = taskMapAllTypes.get(id);
+    if (epic == null || epic.getType() != TypesOfTask.EPIC) {
+      throw new TaskManagerRuntimeException(
+          "Эпик с ID " + id + " не найден или имеет неверный тип. Удаление не выполнено.");
     }
+
+    Epic epicToRemove = (Epic) epic;
+
+    List<Subtask> subtaskListForRemove = new ArrayList<>(epicToRemove.getSubtaskSet());
+    for (Subtask subtask : subtaskListForRemove) {
+      removeSubtaskById(subtask.getIdTask());
+    }
+
+    removeTaskFromCollections(epicToRemove);
   }
 
-  protected void removeSubtaskById(int id) {
-    Subtask subtaskToRemove = subtaskMap.get(id);
-    if (subtaskToRemove == null) {
-      System.out.println("Подзадача с ID " + id + " не найдена. Удаление не выполнено.");
-      return;
+  private void removeSubtaskById(int id) {
+    Subtask subtaskToRemove = (Subtask) taskMapAllTypes.get(id);
+    if (subtaskToRemove == null || subtaskToRemove.getType() != TypesOfTask.SUBTASK) {
+      throw new TaskManagerRuntimeException(
+          "Подзадача с ID " + id + " не найдена или имеет неверный тип. Удаление не выполнено.");
     }
-    Epic epic = epicMap.get(subtaskToRemove.getEpicIdTask());
+    Epic epic = (Epic) taskMapAllTypes.get(subtaskToRemove.getEpicIdTask());
     if (epic != null) {
       epic.deleteSubtaskFromSubtasksSet(subtaskToRemove);
       recalcEpicStatus(epic);
       epic.calculateEndTime();
     }
-    prioritizedTasks.remove(subtaskToRemove);
-    historyManager.remove(id);
-    subtaskMap.remove(id);
+    removeTaskFromCollections(subtaskToRemove);
   }
 
   @Override
   public void removeTaskById(int id) {
-    Task taskToRemove = taskMap.get(id);
+    Task taskToRemove = taskMapAllTypes.get(id);
     if (taskToRemove == null) {
-      System.out.println("Задача с ID " + id + " не найдена. Удаление не выполнено.");
-      return;
+      throw new TaskManagerRuntimeException(
+          "Задача с ID " + id + " не найдена. Удаление не выполнено.");
     }
     switch (taskToRemove.getType()) {
       case TASK -> {
-        prioritizedTasks.remove(taskToRemove);
-        taskMap.remove(id);
-        historyManager.remove(id);
+        removeTaskFromCollections(taskToRemove);
       }
       case EPIC -> removeEpicById(taskToRemove.getIdTask());
       case SUBTASK -> removeSubtaskById(taskToRemove.getIdTask());
@@ -294,53 +256,108 @@ public class InMemoryTaskManager implements TaskManager {
     }
   }
 
+  private void removeTaskFromCollections(Task task) {
+    if (taskMapAllTypes.get(task.getIdTask()) != null) {
+      taskMapAllTypes.remove(task.getIdTask());
+      historyManager.remove(task.getIdTask());
+      prioritizedTasks.remove(task);
+    } else
+      throw new TaskManagerRuntimeException(
+          "Задача с ID " + task.getIdTask() + " не найдена. Удаление не выполнено.");
+  }
+
   @Override
   public String toString() {
     return "InMemoryTaskManager{" + "historyManager=" + historyManager + '}';
   }
 
-  private void updateEpic(Epic newEpic, int oldId) {
-    Epic oldEpic = epicMap.get(oldId);
-    // сохраняем связь с подзадачами
-    for (Subtask subtask : oldEpic.getSubtaskSet()) {
-      newEpic.addSubtask(subtask);
-    }
-    // статус пересчитывается только по сабтаскам
-    recalcEpicStatus(newEpic);
-    epicMap.replace(oldId, newEpic);
+  @Override
+  public void updateEpic(Epic newEpic, int oldId) {
+      Task taskToUpdate = taskMapAllTypes.get(oldId);
+      if (taskToUpdate == null || taskToUpdate.getType() != TypesOfTask.EPIC) {
+          throw new TaskManagerRuntimeException(
+              "Эпик с ID " + oldId + " не найден или имеет неверный тип. Обновление не выполнено.");
+      }
+
+      Epic oldEpic = (Epic) taskToUpdate;
+
+      // Переносим все подзадачи в новый эпик
+      for (Subtask subtask : oldEpic.getSubtaskSet()) {
+          newEpic.addSubtask(subtask);
+      }
+
+      // Проверяем пересечение нового эпика с существующими задачами
+      if (!isNoOverLap(newEpic)) {
+          throw new TaskTimeOverlapException(timeOverLapError);
+      }
+
+      // Обновляем эпик в коллекции
+      taskMapAllTypes.replace(oldId, newEpic);
+
+      // Пересчитываем статус
+      recalcEpicStatus(newEpic);
   }
 
-  protected void updateSubtask(Subtask newSubtask, int oldId) {
-    Subtask oldSubtask = subtaskMap.get(oldId);
-    if (oldSubtask == null) {
-      System.out.println("Подзадача с ID " + oldId + " не найдена. Обновление не выполнено.");
-      return;
+  @Override
+  public void updateSubtask(Subtask newSubtask, int oldId) {
+    // Проверка существования подзадачи
+    Task taskToUpdate = taskMapAllTypes.get(oldId);
+    if (taskToUpdate == null || taskToUpdate.getType() != TypesOfTask.SUBTASK) {
+      throw new TaskManagerRuntimeException(
+          "Подзадача с ID " + oldId + " не найдена или имеет неверный тип.");
     }
+    Subtask oldSubtask = (Subtask) taskToUpdate;
+    // Удаляем подзадачу из старого эпика
+    try {
+      Epic oldEpic = (Epic) taskMapAllTypes.get(oldSubtask.getEpicIdTask());
+      if (oldEpic != null) {
+        oldEpic.deleteSubtaskFromSubtasksSet(oldSubtask);
+      }
+    } catch (ClassCastException e) {
+      throw new TaskManagerRuntimeException("Ошибка: старый эпик подзадачи имеет неверный тип.", e);
+    }
+
+    // Проверка пересечения по времени
     if (!isNoOverLap(newSubtask)) {
       throw new TaskTimeOverlapException(timeOverLapError);
     }
+
+    // Обновляем приоритезированные задачи
     prioritizedTasks.remove(oldSubtask);
-    subtaskMap.replace(oldId, newSubtask);
+    taskMapAllTypes.replace(oldId, newSubtask);
     addTaskByPriority(newSubtask);
-    Epic epic = epicMap.get(newSubtask.getEpicIdTask());
-    if (epic != null) {
-      recalcEpicStatus(epic);
-      epic.calculateEndTime();
+
+    // Добавляем подзадачу в новый эпик и пересчитываем статусы
+    try {
+      Epic newEpic = (Epic) taskMapAllTypes.get(newSubtask.getEpicIdTask());
+      if (newEpic != null) {
+        newEpic.addSubtask(newSubtask);
+        recalcEpicStatus(newEpic);
+        newEpic.calculateEndTime();
+      } else {
+        throw new TaskManagerRuntimeException(
+            "Эпик с ID " + newSubtask.getEpicIdTask() + " для подзадачи не найден.");
+      }
+    } catch (ClassCastException e) {
+      throw new TaskManagerRuntimeException("Ошибка: новый эпик подзадачи имеет неверный тип.", e);
     }
   }
 
   @Override
   public void updateTask(Task newTask, int oldId) {
-    if (!taskMap.containsKey(oldId)) {
-      System.out.println("Задача с ID " + oldId + " не найдена. Обновление не выполнено.");
-      return;
+    if (!taskMapAllTypes.containsKey(oldId)) {
+      throw new TaskManagerRuntimeException(
+          "Задача с ID " + oldId + " не найдена. Обновление не выполнено.");
     }
-    if (!isNoOverLap(newTask)) {
+    if (newTask.getType() != TypesOfTask.TASK) {
+      throw new TaskManagerRuntimeException("Неверный тип задачи для обновления. Ожидался TASK.");
+    }
+    if (isNoOverLap(newTask)) {
       throw new TaskTimeOverlapException(timeOverLapError);
     }
-    Task oldTask = taskMap.get(oldId);
+    Task oldTask = taskMapAllTypes.get(oldId);
     prioritizedTasks.remove(oldTask);
-    taskMap.replace(oldId, newTask);
+    taskMapAllTypes.replace(oldId, newTask);
     addTaskByPriority(newTask);
   }
 }

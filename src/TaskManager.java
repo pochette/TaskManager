@@ -4,8 +4,6 @@ public interface TaskManager {
 
     void createTask(Task task);
 
-    Epic getEpicById(int id);
-
     List<Epic> getEpicList();
 
     List<Task> getHistory();
@@ -31,6 +29,10 @@ public interface TaskManager {
     void removeAllTypesOfTasks();
 
     void removeTaskById(int id);
+
+    void updateEpic(Epic newEpic, int oldId);
+
+    void updateSubtask(Subtask newSubtask, int oldId);
 
     void updateTask(Task newTask, int oldId);
 
