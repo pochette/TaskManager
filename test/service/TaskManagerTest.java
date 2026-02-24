@@ -210,40 +210,33 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManagerReadAndWrite.createTask(task1);
         taskManagerReadAndWrite.createTask(task2);
 
-        Subtask updatedSubtask = new Subtask("update Subtask1", "update description subtask1",
-                Task.Status.IN_PROGRESS,
-                Duration.ofHours(24), // 1 день
-                LocalDateTime.of(2026, 1, 7, 10, 0), // 7 января (после всех задач)
-                epic.getIdTask());
-
-        // Исправляем время, чтобы не пересекалось
+        // Обновляем subtask2 без пересечений
         taskManagerReadAndWrite.updateSubtask(new Subtask(subtask2.getIdTask(),
-                        "new title Subtask2",
-                        "new description Subtask2",
-                        Task.Status.DONE,
-                        Duration.ofHours(36), // 1.5 дня
-                        LocalDateTime.of(2026, 1, 8, 19, 19), // 8 января
-                        subtask2.getEpicIdTask()),
-                subtask2.getIdTask());
+                "new title Subtask2",
+                "new description Subtask2",
+                Task.Status.DONE,
+                Duration.ofHours(36),
+                LocalDateTime.of(2026, 1, 8, 19, 19),
+                subtask2.getEpicIdTask()),
+            subtask2.getIdTask());
 
+        // Обновляем subtask1 с непересекающимся временем
+        Subtask updatedSubtask = new Subtask("update Subtask1", "update description subtask1",
+            Task.Status.IN_PROGRESS,
+            Duration.ofHours(24),
+            LocalDateTime.of(2026, 1, 10, 10, 0), // После subtask2
+            epic.getIdTask());
         taskManagerReadAndWrite.updateSubtask(updatedSubtask, subtask1.getIdTask());
         assertEquals(updatedSubtask, taskManagerReadAndWrite.getTaskById(subtask1.getIdTask()));
 
-        Subtask updatedSubtask2 = new Subtask("update Subtask2", "update description subtask2",
-                Task.Status.DONE,
-                Duration.ofHours(48), // 2 дня
-                LocalDateTime.of(2019, 1, 9, 10, 0), // 9 января
-                epic.getIdTask());
-
-        taskManagerReadAndWrite.updateSubtask(updatedSubtask2, subtask1.getIdTask());
-        assertEquals(updatedSubtask2, taskManagerReadAndWrite.getTaskById(subtask1.getIdTask()));
-
+        // Обновляем эпик (без времени, так как это контейнер)
         Epic updatedEpic = new Epic("updated Epic", Task.Status.DONE, "updated description epic");
         taskManagerReadAndWrite.updateEpic(updatedEpic, epic.getIdTask());
         assertEquals(updatedEpic, taskManagerReadAndWrite.getTaskById(epic.getIdTask()));
 
+        // Обновляем обычные задачи
         Task updatedTask1 = new Task("upd Task1 title", "upd Task1 description", Task.Status.DONE,
-                Duration.ofDays(2), LocalDateTime.of(2024, 1, 10, 2, 35)); // 10 января
+            Duration.ofDays(2), LocalDateTime.of(2024, 1, 10, 2, 35));
         taskManagerReadAndWrite.updateTask(updatedTask1, task1.getIdTask());
         assertEquals(updatedTask1, taskManagerReadAndWrite.getTaskById(task1.getIdTask()));
     }

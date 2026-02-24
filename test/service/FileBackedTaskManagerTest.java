@@ -23,14 +23,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
   FileTaskStorage fileTaskStorageOnlyRead =
       new FileTaskStorage(TEST_FILE_PATH, null, new Managers.CSV_TRANSFORMER()::getTaskFromLoad);
 
-  void clearCSVFile() throws IOException {
-    if (Files.exists(FILE_PATH)) {
-      Files.delete(FILE_PATH);
-    }
-    Files.createFile(FILE_PATH);
-    Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
-  }
-
   @Override
   @BeforeEach
   void setUp() throws IOException {
@@ -42,11 +34,21 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     super.setUp();
   }
 
+  void clearCSVFile() throws IOException {
+    if (Files.exists(FILE_PATH)) {
+      Files.delete(FILE_PATH);
+    }
+    Files.createFile(FILE_PATH);
+    Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
+  }
+
   @AfterEach
   void tearDown() throws IOException {
     clearCSVFile();
-    taskManagerReadAndWrite.getHistory().clear();
-    taskManagerOnlyRead.getHistory().clear();
+
+    HistoryManager historyManager = Managers.getDefaultHistory();
+    historyManager.getHistory()
+        .forEach(task -> historyManager.remove(task.getIdTask()));
   }
 
   @Test

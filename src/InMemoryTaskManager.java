@@ -352,7 +352,7 @@ public class InMemoryTaskManager implements TaskManager {
     if (newTask.getType() != TypesOfTask.TASK) {
       throw new TaskManagerRuntimeException("Неверный тип задачи для обновления. Ожидался TASK.");
     }
-    if (isNoOverLap(newTask)) {
+    if (!isNoOverLap(newTask)) {
       throw new TaskTimeOverlapException(timeOverLapError);
     }
     Task oldTask = taskMapAllTypes.get(oldId);
