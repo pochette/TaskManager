@@ -1,6 +1,4 @@
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,8 +7,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
   private static final Path FILE_PATH = Path.of("src/Backend/Backend.csv");
@@ -19,26 +18,24 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
       new Managers.CSV_TRANSFORMER()::serializeTask;
   private final Function<String, Task> csvDeserializer =
       new Managers.CSV_TRANSFORMER()::getTaskFromLoad;
-  FileTaskStorage fileTaskStorageReadAndWrite = new FileTaskStorage(FILE_PATH, csvSerializer, csvDeserializer);
-  FileTaskStorage fileTaskStorageOnlyRead =
-      new FileTaskStorage(TEST_FILE_PATH, null, new Managers.CSV_TRANSFORMER()::getTaskFromLoad);
+
 
   @Override
   @BeforeEach
   void setUp() throws IOException {
-//    clearCSVFile();
-
+      clearCSVFile();
+      FileTaskStorage fileTaskStorageReadAndWrite = new FileTaskStorage(FILE_PATH, csvSerializer, csvDeserializer);
     taskManagerReadAndWrite = new FileBackedTaskManager(Managers.getDefaultHistory(), fileTaskStorageReadAndWrite);
-    taskManagerOnlyRead = new FileBackedTaskManager(Managers.getDefaultHistory(), fileTaskStorageOnlyRead);
 
     super.setUp();
   }
 
   void clearCSVFile() throws IOException {
-      if (Files.exists(FILE_PATH)) {
-          Files.delete(FILE_PATH);
-   } else Files.createFile(FILE_PATH);
-// Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
+      Files.createDirectories(FILE_PATH.getParent());
+      if (!Files.exists(FILE_PATH)) {
+          Files.createFile(FILE_PATH);
+      }
+Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
 
   }
 
@@ -246,22 +243,37 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     taskManagerReadAndWrite.createTask(subtask1);
     taskManagerReadAndWrite.createTask(subtask2);
 
-    List<Task> loadedTasks = fileTaskStorageReadAndWrite.loadTasksFromFile();
+    taskManagerReadAndWrite.getTaskById(task1.getIdTask());
+    taskManagerReadAndWrite.getTaskById(task2.getIdTask());
+    taskManagerReadAndWrite.getTaskById(epic.getIdTask());
+    taskManagerReadAndWrite.getTaskById(subtask1.getIdTask());
+    taskManagerReadAndWrite.getTaskById(subtask2.getIdTask());
+
+    List<String> linesFromFile;
+    try {
+      linesFromFile = Files.readAllLines(FILE_PATH);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    assertEquals(8, linesFromFile.size(), "File should contain 8 lines");
+    assertEquals(
+        String.format(
+            "%d,%d,%d,%d,%d",
+            task1.getIdTask(),
+            task2.getIdTask(),
+            epic.getIdTask(),
+            subtask1.getIdTask(),
+            subtask2.getIdTask()),
+        linesFromFile.getLast(),
+        "History line should be the last line");
   }
 
   @Test
   void test7_shouldThrowManagerReadException() {
+    Path missingPath = Paths.get("build", "missing", java.util.UUID.randomUUID() + ".csv");
     assertThrows(
-        ManagerReadException.class,
-        () -> {
-          FileBackedTaskManager failedTaskManager =
-              new FileBackedTaskManager(
-                  Managers.getDefaultHistory(),
-                  new FileTaskStorage(Paths.get("dvdsa"), csvSerializer, csvDeserializer));
-          failedTaskManager.createTask(task1);
-
-        });
-
-    // createFileIfNotExist() test
+        TaskManagerRuntimeException.class,
+        () -> new FileTaskStorage(missingPath, csvSerializer, csvDeserializer));
   }
 }

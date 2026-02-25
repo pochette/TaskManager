@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected T taskManagerReadAndWrite;
-    protected T taskManagerOnlyRead;
     protected Task task1;
     protected Task task2;
     protected Epic epic;

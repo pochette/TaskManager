@@ -14,9 +14,26 @@ public class FileTaskStorage implements TaskStorage {
 
   public FileTaskStorage(
       Path path, Function<Task, String> serializer, Function<String, Task> deserializer) {
+    validatePath(path);
     this.path = path;
     this.serializer = serializer;
     this.deserializer = deserializer;
+  }
+
+  private void validatePath(Path path) {
+    if (path == null) {
+      throw new TaskManagerRuntimeException("Путь к файлу не может быть null.");
+    }
+    if (!Files.exists(path)) {
+      throw new TaskManagerRuntimeException("Файл не существует: " + path);
+    }
+    if (Files.isDirectory(path)) {
+      throw new TaskManagerRuntimeException("Ожидался файл, но указан каталог: " + path);
+    }
+    Path parent = path.getParent();
+    if (parent != null && !Files.exists(parent)) {
+      throw new TaskManagerRuntimeException("Каталог для файла не существует: " + parent);
+    }
   }
 
   @Override
