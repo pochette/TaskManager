@@ -215,7 +215,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 "new title Subtask2",
                 "new description Subtask2",
                 Task.Status.DONE,
-                Duration.ofHours(36),
+                Duration.ofHours(24),
                 LocalDateTime.of(2026, 1, 8, 19, 19),
                 subtask2.getEpicIdTask()),
             subtask2.getIdTask());

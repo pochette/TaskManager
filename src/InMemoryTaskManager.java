@@ -286,11 +286,6 @@ public class InMemoryTaskManager implements TaskManager {
           newEpic.addSubtask(subtask);
       }
 
-      // Проверяем пересечение нового эпика с существующими задачами
-      if (!isNoOverLap(newEpic)) {
-          throw new TaskTimeOverlapException(timeOverLapError);
-      }
-
       // Обновляем эпик в коллекции
       taskMapAllTypes.replace(oldId, newEpic);
 

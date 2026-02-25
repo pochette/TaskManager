@@ -34,7 +34,7 @@ public class FileTaskStorage implements TaskStorage {
       }
 
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ManagerReadException("Не удалось прочитать список задач из файла",  e.getCause());
     }
     return tasks;
   }

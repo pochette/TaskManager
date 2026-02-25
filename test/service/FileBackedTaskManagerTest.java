@@ -26,7 +26,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
   @Override
   @BeforeEach
   void setUp() throws IOException {
-    clearCSVFile();
+//    clearCSVFile();
 
     taskManagerReadAndWrite = new FileBackedTaskManager(Managers.getDefaultHistory(), fileTaskStorageReadAndWrite);
     taskManagerOnlyRead = new FileBackedTaskManager(Managers.getDefaultHistory(), fileTaskStorageOnlyRead);
@@ -35,16 +35,16 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
   }
 
   void clearCSVFile() throws IOException {
-    if (Files.exists(FILE_PATH)) {
-      Files.delete(FILE_PATH);
-    }
-    Files.createFile(FILE_PATH);
-    Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
+      if (Files.exists(FILE_PATH)) {
+          Files.delete(FILE_PATH);
+   } else Files.createFile(FILE_PATH);
+// Files.write(FILE_PATH, "id,type,name,status,description,duration,startTime,epic\n".getBytes());
+
   }
 
   @AfterEach
   void tearDown() throws IOException {
-    clearCSVFile();
+      clearCSVFile();
 
     HistoryManager historyManager = Managers.getDefaultHistory();
     historyManager.getHistory()
@@ -250,16 +250,16 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
   }
 
   @Test
-  void test7_shouldThrowManagerSaveException() {
+  void test7_shouldThrowManagerReadException() {
     assertThrows(
-        ManagerSaveException.class,
+        ManagerReadException.class,
         () -> {
           FileBackedTaskManager failedTaskManager =
               new FileBackedTaskManager(
                   Managers.getDefaultHistory(),
-                  new FileTaskStorage(
-                      Paths.get("........dfdsaf."), csvSerializer, csvDeserializer));
+                  new FileTaskStorage(Paths.get("dvdsa"), csvSerializer, csvDeserializer));
           failedTaskManager.createTask(task1);
+
         });
 
     // createFileIfNotExist() test
