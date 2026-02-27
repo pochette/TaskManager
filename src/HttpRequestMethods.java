@@ -1,4 +1,4 @@
-public enum HTTPRequestMethods {
+public enum HttpRequestMethods {
     GET,
     POST,
     DELETE;
