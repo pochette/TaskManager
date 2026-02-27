@@ -4,15 +4,14 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.Duration;
-
-
 
 
 public abstract class BaseHTTPHandler implements HttpHandler {
     protected TaskManager taskManager = Managers.getDefault();
     protected TaskSerializer taskSerializer = null;
+
 
     public Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -22,10 +21,32 @@ public abstract class BaseHTTPHandler implements HttpHandler {
         return gsonBuilder.create();
     }
 
-    protected void sendResponse(HttpExchange httpExchange, String text ) throws IOException {
-
+    protected void sendNotFound(HttpExchange exchange, String message) throws IOException {
+        exchange.sendResponseHeaders(HttpCodeResponse.NOT_FOUND.getCode(), 0);
+        exchange.getResponseBody().write(message.getBytes(StandardCharsets.UTF_8));
     }
 
-    protected void send
+    protected void sendHasOverLap(HttpExchange exchange) throws IOException {
+        exchange.sendResponseHeaders(HttpCodeResponse.OVERLAP.getCode(), 0);
+    }
+
+    protected void sendMethodNotAllowed(HttpExchange exchange) throws IOException {
+        exchange.sendResponseHeaders(HttpCodeResponse.NOT_ALLOWED.getCode(), 0);
+    }
+
+    protected Integer parsTaskId(String path) {
+        try {
+            return Integer.parseInt(path);
+        } catch (NumberFormatException numberFormatException) {
+            return -1;
+        }
+    }
+
+    protected void sendResponse(HttpExchange httpExchange, String text) throws IOException {
+        byte[] response = text.getBytes(StandardCharsets.UTF_8);
+        httpExchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        httpExchange.sendResponseHeaders(HttpCodeResponse.OK.getCode(), response.length);
+        httpExchange.getResponseBody().write(response);
+    }
 
 }

@@ -1,4 +1,4 @@
-public enum HTTPCodeResponse {
+public enum HttpCodeResponse {
     OK(200),
     MODIFIED(201),
     NOT_FOUND(404),
@@ -7,7 +7,7 @@ public enum HTTPCodeResponse {
     SERVER_ERROR(500);
     private final int code;
 
-    HTTPCodeResponse(int code) {
+    HttpCodeResponse(int code) {
         this.code = code;
     }
 public int getCode() { return code;}
