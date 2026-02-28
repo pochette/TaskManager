@@ -1,6 +1,11 @@
+import model.Epic;
+import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.Managers;
+import service.TaskManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -23,7 +28,7 @@ public class HistoryManagerTest {
         task2 = new Task("Task2 title", "Task2 Description", Task.Status.NEW,
                 Duration.ofDays(10), LocalDateTime.of(2021, 12, 25, 10, 0));
 
-        epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
+        epic = new Epic("model.Epic title", Task.Status.NEW, "model.Epic Description");
 
         subtask1 = new Subtask(
                 "Subtask1 title",

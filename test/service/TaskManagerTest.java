@@ -1,4 +1,8 @@
+import model.Epic;
+import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.*;
+import service.TaskManager;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -23,7 +27,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         task2 = new Task("Task2 title", "Task2 Description", Task.Status.NEW,
                 Duration.ofDays(10), LocalDateTime.of(2021, 12, 25, 10, 0));
 
-        epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
+        epic = new Epic("model.Epic title", Task.Status.NEW, "model.Epic Description");
 
         subtask1 = new Subtask(
                 "Subtask1 title",
@@ -229,7 +233,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(updatedSubtask, taskManagerReadAndWrite.getTaskById(subtask1.getIdTask()));
 
         // Обновляем эпик (без времени, так как это контейнер)
-        Epic updatedEpic = new Epic("updated Epic", Task.Status.DONE, "updated description epic");
+        Epic updatedEpic = new Epic("updated model.Epic", Task.Status.DONE, "updated description epic");
         taskManagerReadAndWrite.updateEpic(updatedEpic, epic.getIdTask());
         assertEquals(updatedEpic, taskManagerReadAndWrite.getTaskById(epic.getIdTask()));
 

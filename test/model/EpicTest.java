@@ -1,9 +1,14 @@
+import model.Epic;
+import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import service.InMemoryHistoryManager;
+import service.InMemoryTaskManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,10 +26,10 @@ class EpicTest {
     @BeforeEach
     void setUp() {
         taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
-        epic = new Epic("Epic title", Task.Status.NEW, "Epic Description");
-        subtask1 = new Subtask("Subtask 1", "Description 1", Task.Status.NEW,
+        epic = new Epic("model.Epic title", Task.Status.NEW, "model.Epic Description");
+        subtask1 = new Subtask("model.Subtask 1", "Description 1", Task.Status.NEW,
                 Duration.ofDays(43), LocalDateTime.of(2024,1,4,4,56), epic.getIdTask());
-        subtask2 = new Subtask("Subtask 2 title", "Description Subtask2", Task.Status.NEW,
+        subtask2 = new Subtask("model.Subtask 2 title", "Description Subtask2", Task.Status.NEW,
                 Duration.ofHours(56), LocalDateTime.of(2026,1,5,6,34), epic.getIdTask());
     }
     @AfterEach
@@ -55,7 +60,7 @@ class EpicTest {
         Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
 
         //Then
-        assertEquals(expectedEpicStatus, actualEpicStatus, "Epic status is not calculated correctly.");
+        assertEquals(expectedEpicStatus, actualEpicStatus, "model.Epic status is not calculated correctly.");
 
     }
 
@@ -74,17 +79,17 @@ class EpicTest {
 //    @ParameterizedTest(name = "{index} Create epic with status of subtasks = {0} and {1} should return epic status = {2}")
 //
 //
-//    void shouldCalculateStatusOfEpicCorreclty(List<Subtask> subtasks, Task.Status expectedEpicStatus) {
+//    void shouldCalculateStatusOfEpicCorreclty(List<model.Subtask> subtasks, model.Task.Status expectedEpicStatus) {
 //        //Given
 //        taskManager.createEpic(epic);
 //        //When
-//        for (Subtask subtask : subtasks) {
+//        for (model.Subtask subtask : subtasks) {
 //            taskManager.createSubtask(subtask);
 //        }
-//        Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
+//        model.Task.Status actualEpicStatus = taskManager.getTaskById(epic.getIdTask()).getStatus();
 //
 //        //Then
-//        assertEquals(expectedEpicStatus, actualEpicStatus, "Epic status is not calculated correctly.");
+//        assertEquals(expectedEpicStatus, actualEpicStatus, "model.Epic status is not calculated correctly.");
 //
 //        //
 //    }
@@ -93,30 +98,30 @@ class EpicTest {
 //        return Stream.of(
 //                Arguments.of(Collections.emptyList()),
 //                Arguments.of(List.of(
-//                        createSubtasksListForEpic(epic, Task.Status.NEW, Task.Status.NEW), Task.Status.NEW
+//                        createSubtasksListForEpic(epic, model.Task.Status.NEW, model.Task.Status.NEW), model.Task.Status.NEW
 //                )),
 //                Arguments.of(List.of(
-//                        createSubtasksListForEpic(epic, Task.Status.DONE, Task.Status.DONE), Task.Status.DONE
+//                        createSubtasksListForEpic(epic, model.Task.Status.DONE, model.Task.Status.DONE), model.Task.Status.DONE
 //                )),
 //                Arguments.of(List.of(
-//                        createSubtasksListForEpic(epic, Task.Status.NEW, Task.Status.DONE), Task.Status.IN_PROGRESS
+//                        createSubtasksListForEpic(epic, model.Task.Status.NEW, model.Task.Status.DONE), model.Task.Status.IN_PROGRESS
 //                )),
 //                Arguments.of(List.of(
-//                        createSubtasksListForEpic(epic, Task.Status.IN_PROGRESS, Task.Status.IN_PROGRESS), Task.Status.IN_PROGRESS
+//                        createSubtasksListForEpic(epic, model.Task.Status.IN_PROGRESS, model.Task.Status.IN_PROGRESS), model.Task.Status.IN_PROGRESS
 //                )),
 //                Arguments.of(List.of(
-//                        createSubtasksListForEpic(epic, Task.Status.NEW, Task.Status.IN_PROGRESS), Task.Status.IN_PROGRESS
+//                        createSubtasksListForEpic(epic, model.Task.Status.NEW, model.Task.Status.IN_PROGRESS), model.Task.Status.IN_PROGRESS
 //                )),
 //                Arguments.of(List.of(
-//                        createSubtasksListForEpic(epic, Task.Status.DONE, Task.Status.IN_PROGRESS), Task.Status.IN_PROGRESS
+//                        createSubtasksListForEpic(epic, model.Task.Status.DONE, model.Task.Status.IN_PROGRESS), model.Task.Status.IN_PROGRESS
 //                ))
 //        );
 //    }
 //
 //
-//    private static List<Subtask> createSubtasksListForEpic(Epic epic, Task.Status statusSubtask1, Task.Status statusSubtask2) {
-//        Subtask subtask1 = new Subtask("Subtask 1", "Description 1", epic.getIdTask(), statusSubtask1);
-//        Subtask subtask2 = new Subtask("Subtask 2", "Description 2", epic.getIdTask(), statusSubtask2);
+//    private static List<model.Subtask> createSubtasksListForEpic(model.Epic epic, model.Task.Status statusSubtask1, model.Task.Status statusSubtask2) {
+//        model.Subtask subtask1 = new model.Subtask("model.Subtask 1", "Description 1", epic.getIdTask(), statusSubtask1);
+//        model.Subtask subtask2 = new model.Subtask("model.Subtask 2", "Description 2", epic.getIdTask(), statusSubtask2);
 //        taskManager.createSubtask(subtask1);
 //        taskManager.createSubtask(subtask2);
 //        return List.of(subtask1, subtask2);
