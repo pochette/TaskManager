@@ -1,8 +1,9 @@
 package server;
 
+import model.Task;
+
 public interface TaskSerializer {
-        Task fromJson(String json);
+  Task fromJson(String json);
 
-    String toJson(Task task);
+  String toJson(Task task);
 }
-
