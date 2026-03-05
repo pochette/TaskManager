@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import server.handlers.*;
 import service.Managers;
 import service.TaskManager;
 
@@ -26,9 +27,18 @@ public class HttpTaskServer {
     public HttpTaskServer() throws IOException {
         apiToken = generateApiToken();
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
-        server.createContext("/register", this::register);
-        server.createContext("/save", this::save);
-        server.createContext("/load", this::load);
+        createEndpoints();
+    }
+
+    private void createEndpoints() {
+        server.createContext("/tasks/task", new TaskHandler());
+        server.createContext("/tasks/epic", new EpicHandler());
+        server.createContext("/tasks/subtask", new SubtaskHandler());
+        server.createContext("/tasks/history", new HistoryHandler());
+        server.createContext("/tasks/prioritize", new PrioritizeTasksHandler());
+    }
+    public void stop() {
+        server.stop(0);
     }
 
     private void load(HttpExchange h) {

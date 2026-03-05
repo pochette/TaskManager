@@ -1,9 +1,13 @@
-package server;
+package server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import server.DurationAdapter;
+import server.HttpCodeResponse;
+import server.LocalDateTimeAdapter;
+import server.TaskSerializer;
 import service.Managers;
 import service.TaskManager;
 
