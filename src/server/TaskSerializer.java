@@ -1,5 +1,6 @@
 package server;
 
+import com.google.gson.Gson;
 import model.Task;
 
 public interface TaskSerializer {

@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import server.DurationAdapter;
-import server.HttpCodeResponse;
-import server.LocalDateTimeAdapter;
-import server.TaskSerializer;
+import server.*;
 import service.Managers;
 import service.TaskManager;
 
@@ -18,16 +15,8 @@ import java.time.LocalDateTime;
 
 public abstract class BaseHTTPHandler implements HttpHandler {
     protected TaskManager taskManager = Managers.getDefault();
-    protected TaskSerializer taskSerializer = null;
+    protected TaskSerializer taskSerializer = new JsonTaskSerializer();
 
-
-    public Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gsonBuilder.registerTypeAdapter(DurationAdapter.class, new DurationAdapter());
-        gsonBuilder.setPrettyPrinting();
-        return gsonBuilder.create();
-    }
 
     protected void sendNotFound(HttpExchange exchange, String message) throws IOException {
         exchange.sendResponseHeaders(HttpCodeResponse.NOT_FOUND.getCode(), 0);
@@ -56,5 +45,10 @@ public abstract class BaseHTTPHandler implements HttpHandler {
         httpExchange.sendResponseHeaders(HttpCodeResponse.OK.getCode(), response.length);
         httpExchange.getResponseBody().write(response);
     }
+    protected String getBody(HttpExchange httpExchange) throws IOException {
+        return new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+
 
 }
