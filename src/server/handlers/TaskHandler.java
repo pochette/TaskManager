@@ -15,6 +15,7 @@ import model.Subtask;
 import model.TypesOfTask;
 import server.HttpCodeResponse;
 import service.NotFoundException;
+import service.TaskManagerRuntimeException;
 import service.TaskTimeOverlapException;
 
 public class TaskHandler extends BaseHTTPHandler implements HttpHandler {
@@ -111,6 +112,14 @@ public class TaskHandler extends BaseHTTPHandler implements HttpHandler {
             taskManager.removeAllTypesOfTasks();
             exchange.sendResponseHeaders(HttpCodeResponse.OK.getCode(), 0);
             return;
-        } if (Pattern.matches("^/tasks/\\d+"))
+        } if (Pattern.matches("^/tasks/\\d+$", path)) {
+            Integer id = parseTaskId(path.replaceFirst("task/", ""));
+            if (id > 0) {
+                taskManager.removeTaskById(id);
+                exchange.sendResponseHeaders(HttpCodeResponse.OK.getCode(), 0);
+            } else {
+                sendMethodNotAllowed(exchange);
+            }
+      }
   }
 }

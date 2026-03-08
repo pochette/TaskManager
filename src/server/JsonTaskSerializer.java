@@ -1,10 +1,10 @@
 package server;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.Task;
 
 import java.time.Duration;
+import java.util.Collection;
 
 public class JsonTaskSerializer implements TaskSerializer {
     private final GsonBuilder gsonBuilder = createGsonBuilder();
@@ -24,5 +24,10 @@ public class JsonTaskSerializer implements TaskSerializer {
     @Override
     public String toJson(Task task) {
         return gsonBuilder.create().toJson(task);
+    }
+
+    @Override
+    public String toJson(Collection<? extends Task> tasks) {
+        return gsonBuilder.create().toJson(tasks);
     }
 }
